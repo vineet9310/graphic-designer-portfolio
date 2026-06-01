@@ -3,15 +3,22 @@
 import React from 'react';
 import Link from 'next/link';
 import { FaInstagram, FaBehance, FaLinkedinIn, FaEnvelope } from 'react-icons/fa';
+import { useSettings } from '@/hooks/useSettings';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const { settings } = useSettings();
+
+  const email = settings?.contact?.email || 'designer@example.com';
+  const instagramUrl = settings?.contact?.instagramUrl || 'https://instagram.com';
+  const behanceUrl = settings?.contact?.behanceUrl || 'https://behance.net';
+  const linkedinUrl = settings?.contact?.linkedinUrl || 'https://linkedin.com';
 
   const socialLinks = [
-    { icon: <FaInstagram />, url: 'https://instagram.com', name: 'Instagram' },
-    { icon: <FaBehance />, url: 'https://behance.net', name: 'Behance' },
-    { icon: <FaLinkedinIn />, url: 'https://linkedin.com', name: 'LinkedIn' },
-    { icon: <FaEnvelope />, url: 'mailto:designer@example.com', name: 'Email' }
+    { icon: <FaInstagram />, url: instagramUrl, name: 'Instagram' },
+    { icon: <FaBehance />, url: behanceUrl, name: 'Behance' },
+    { icon: <FaLinkedinIn />, url: linkedinUrl, name: 'LinkedIn' },
+    { icon: <FaEnvelope />, url: `mailto:${email}`, name: 'Email' }
   ];
 
   return (

@@ -4,26 +4,37 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useProjects } from '@/hooks/useProjects';
+import { useSettings } from '@/hooks/useSettings';
 import ProjectCard from '@/components/ProjectCard';
 
 const Home = () => {
-  const { featuredProjects, loading, fetchFeaturedProjects } = useProjects();
+  const { featuredProjects, loading: projectsLoading, fetchFeaturedProjects } = useProjects();
+  const { settings, loading: settingsLoading } = useSettings();
 
   useEffect(() => {
     fetchFeaturedProjects();
   }, [fetchFeaturedProjects]);
 
-  const toolsList = [
-    'Figma', 'Adobe Illustrator', 'Adobe Photoshop', 'Adobe After Effects', 
-    'Blender 3D', 'Cinema 4D', 'Procreate', 'InDesign', 'Premiere Pro'
-  ];
+  // Fallback defaults in case settings is still loading/empty
+  const toolsList = settings?.tools && settings.tools.length > 0 
+    ? settings.tools 
+    : [
+        'Figma', 'Adobe Illustrator', 'Adobe Photoshop', 'Adobe After Effects', 
+        'Blender 3D', 'Cinema 4D', 'Procreate', 'InDesign', 'Premiere Pro'
+      ];
 
-  const stats = [
-    { value: '50+', label: 'Projects Completed' },
-    { value: '30+', label: 'Happy Clients' },
-    { value: '5+', label: 'Years Experience' },
-    { value: '100%', label: 'Client Satisfaction' }
-  ];
+  const stats = settings?.stats && settings.stats.length > 0
+    ? settings.stats
+    : [
+        { value: '50+', label: 'Projects Completed' },
+        { value: '30+', label: 'Happy Clients' },
+        { value: '5+', label: 'Years Experience' },
+        { value: '100%', label: 'Client Satisfaction' }
+      ];
+
+  const heroSubtitle = settings?.hero?.subtitle || 'Graphic & Brand Designer';
+  const heroTitle = settings?.hero?.title || 'I design things that make people stop scrolling.';
+  const heroDescription = settings?.hero?.description || 'Crafting premium visual identities, digital products, and high-impact designs for bold brands worldwide.';
 
   return (
     <div style={{ backgroundColor: 'var(--bg-primary)', overflow: 'hidden' }}>
@@ -31,11 +42,10 @@ const Home = () => {
       {/* 1. HERO SECTION */}
       <section
         style={{
-          height: 'calc(100vh - 75px)',
           display: 'flex',
           alignItems: 'center',
           position: 'relative',
-          padding: '2rem 0'
+          padding: '3rem 0'
         }}
       >
         {/* Animated Background Shapes */}
@@ -94,7 +104,7 @@ const Home = () => {
                 marginBottom: '1rem'
               }}
             >
-              Graphic & Brand Designer
+              {heroSubtitle}
             </motion.p>
             
             <motion.h1
@@ -108,7 +118,7 @@ const Home = () => {
                 fontFamily: 'var(--font-heading)'
               }}
             >
-              I design things that make people stop scrolling.
+              {heroTitle}
             </motion.h1>
 
             <motion.p
@@ -123,7 +133,7 @@ const Home = () => {
                 maxWidth: '600px'
               }}
             >
-              Crafting premium visual identities, digital products, and high-impact designs for bold brands worldwide.
+              {heroDescription}
             </motion.p>
 
             <motion.div
@@ -163,7 +173,7 @@ const Home = () => {
             </Link>
           </div>
 
-          {loading ? (
+          {(projectsLoading || settingsLoading) ? (
             <div style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',

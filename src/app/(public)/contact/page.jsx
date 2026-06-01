@@ -2,29 +2,56 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaInstagram, FaBehance, FaLinkedinIn, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaInstagram, FaBehance, FaLinkedinIn, FaEnvelope, FaMapMarkerAlt, FaPhone } from 'react-icons/fa';
 import ContactForm from '@/components/ContactForm';
+import { useSettings } from '@/hooks/useSettings';
 
 const Contact = () => {
+  const { settings, loading } = useSettings();
+
+  if (loading) {
+    return (
+      <div style={{ padding: '6rem 0', backgroundColor: 'var(--bg-primary)', minHeight: '80vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <div className="skeleton" style={{ width: '80px', height: '80px', borderRadius: '50%' }} />
+      </div>
+    );
+  }
+
+  const email = settings?.contact?.email || 'designer@example.com';
+  const location = settings?.contact?.location || 'New York City, NY';
+  const phone = settings?.contact?.phone || '';
+  const instagramUrl = settings?.contact?.instagramUrl || 'https://instagram.com';
+  const behanceUrl = settings?.contact?.behanceUrl || 'https://behance.net';
+  const linkedinUrl = settings?.contact?.linkedinUrl || 'https://linkedin.com';
+
   const contactDetails = [
     {
       icon: <FaEnvelope />,
       title: 'Email Direct',
-      value: 'designer@example.com',
-      url: 'mailto:designer@example.com'
+      value: email,
+      url: `mailto:${email}`
     },
     {
       icon: <FaMapMarkerAlt />,
       title: 'Location',
-      value: 'New York City, NY',
+      value: location,
       url: 'https://maps.google.com'
     }
   ];
 
+  if (phone) {
+    contactDetails.push({
+      icon: <FaPhone />,
+      title: 'Phone',
+      value: phone,
+      url: `tel:${phone}`
+    });
+  }
+
   const socialLinks = [
-    { icon: <FaInstagram />, name: 'Instagram', url: 'https://instagram.com' },
-    { icon: <FaBehance />, name: 'Behance', url: 'https://behance.net' },
-    { icon: <FaLinkedinIn />, name: 'LinkedIn', url: 'https://linkedin.com' }
+    { icon: <FaInstagram />, name: 'Instagram', url: instagramUrl },
+    { icon: <FaBehance />, name: 'Behance', url: behanceUrl },
+    { icon: <FaLinkedinIn />, name: 'LinkedIn', url: linkedinUrl }
   ];
 
   return (

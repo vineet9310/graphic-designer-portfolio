@@ -2,55 +2,86 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaDownload, FaPaintBrush, FaFigma, FaLaptopCode, FaCube } from 'react-icons/fa';
+import { FaDownload, FaPaintBrush, FaFigma, FaLaptopCode, FaCube, FaCheck } from 'react-icons/fa';
+import { useSettings } from '@/hooks/useSettings';
 
 const About = () => {
-  const skills = [
-    { name: 'Brand Strategy & Identity', percentage: 95 },
-    { name: 'UI/UX & Web Design', percentage: 90 },
-    { name: 'Vector Illustration', percentage: 85 },
-    { name: 'Motion & Promo Graphics', percentage: 80 },
-    { name: '3D Modelling & Texturing', percentage: 75 }
-  ];
+  const { settings, loading } = useSettings();
 
-  const tools = [
-    { icon: <FaFigma />, name: 'Figma' },
-    { icon: <FaPaintBrush />, name: 'Photoshop' },
-    { icon: <FaLaptopCode />, name: 'Illustrator' },
-    { icon: <FaCube />, name: 'Blender' },
-    { icon: <FaPaintBrush />, name: 'After Effects' },
-    { icon: <FaLaptopCode />, name: 'InDesign' }
-  ];
+  const skills = settings?.skills && settings.skills.length > 0
+    ? settings.skills
+    : [
+        { name: 'Brand Strategy & Identity', percentage: 95 },
+        { name: 'UI/UX & Web Design', percentage: 90 },
+        { name: 'Vector Illustration', percentage: 85 },
+        { name: 'Motion & Promo Graphics', percentage: 80 },
+        { name: '3D Modelling & Texturing', percentage: 75 }
+      ];
 
-  const timeline = [
-    {
-      year: '2023 - Present',
-      role: 'Lead Brand & UI/UX Designer',
-      company: 'PixelForge Studio',
-      description: 'Designing brand guidelines, packaging, and modern high-fidelity web/app interfaces for global scale tech and lifestyle startups.'
-    },
-    {
-      year: '2021 - 2023',
-      role: 'Senior Graphic Designer',
-      company: 'Apex Agency',
-      description: 'Headed the creative direction for social campaigns, vector illustrations, and offline promotional assets for Fortune 500 clients.'
-    },
-    {
-      year: '2019 - 2021',
-      role: 'Junior Creative Designer',
-      company: 'Vortex Media',
-      description: 'Learned industry standards, assisted senior developers, designed monogram proposals, client presentation layouts, and print flyers.'
-    },
-    {
-      year: '2015 - 2019',
-      role: 'BFA in Graphic Design',
-      company: 'Academy of Fine Arts',
-      description: 'Studied core disciplines of visual composition, color theory, typography history, packaging blueprints, and human-centered design.'
-    }
-  ];
+  // Helper function to return icon for tool
+  const getToolIcon = (name) => {
+    const n = name.toLowerCase();
+    if (n.includes('figma')) return <FaFigma />;
+    if (n.includes('blender')) return <FaCube />;
+    if (n.includes('illustrator') || n.includes('indesign')) return <FaLaptopCode />;
+    return <FaPaintBrush />;
+  };
+
+  const tools = settings?.tools && settings.tools.length > 0
+    ? settings.tools.map(t => ({ icon: getToolIcon(t), name: t }))
+    : [
+        { icon: <FaFigma />, name: 'Figma' },
+        { icon: <FaPaintBrush />, name: 'Photoshop' },
+        { icon: <FaLaptopCode />, name: 'Illustrator' },
+        { icon: <FaCube />, name: 'Blender' },
+        { icon: <FaPaintBrush />, name: 'After Effects' },
+        { icon: <FaLaptopCode />, name: 'InDesign' }
+      ];
+
+  const timeline = settings?.timeline && settings.timeline.length > 0
+    ? settings.timeline
+    : [
+        {
+          year: '2023 - Present',
+          role: 'Lead Brand & UI/UX Designer',
+          company: 'PixelForge Studio',
+          description: 'Designing brand guidelines, packaging, and modern high-fidelity web/app interfaces for global scale tech and lifestyle startups.'
+        },
+        {
+          year: '2021 - 2023',
+          role: 'Senior Graphic Designer',
+          company: 'Apex Agency',
+          description: 'Headed the creative direction for social campaigns, vector illustrations, and offline promotional assets for Fortune 500 clients.'
+        },
+        {
+          year: '2019 - 2021',
+          role: 'Junior Creative Designer',
+          company: 'Vortex Media',
+          description: 'Learned industry standards, assisted senior developers, designed monogram proposals, client presentation layouts, and print flyers.'
+        },
+        {
+          year: '2015 - 2019',
+          role: 'BFA in Graphic Design',
+          company: 'Academy of Fine Arts',
+          description: 'Studied core disciplines of visual composition, color theory, typography history, packaging blueprints, and human-centered design.'
+        }
+      ];
+
+  const bioParagraph1 = settings?.about?.bioParagraph1 || "Hello! I'm Alex, a creative director and multidisciplinary designer based in New York. With over 5 years of professional design experience, I specialize in transforming conceptual projects into highly engaging, modern visual assets.";
+  const bioParagraph2 = settings?.about?.bioParagraph2 || "My philosophy revolves around minimalism, high contrast, and grid-based composition. I believe a brand identity should not just represent a company, but command attention and make viewers stop scrolling. Whether it's a sleek logo, an intricate SaaS dashboard, or vector posters, I approach every project with raw artistic intent and absolute precision.";
+  const resumeUrl = settings?.about?.resumeUrl || '#';
+  const portraitImage = settings?.about?.portraitImage || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80";
+
+  if (loading) {
+    return (
+      <div style={{ padding: '6rem 0', backgroundColor: 'var(--bg-primary)', minHeight: '80vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <div className="skeleton" style={{ width: '80px', height: '80px', borderRadius: '50%' }} />
+      </div>
+    );
+  }
 
   return (
-    <div style={{ padding: '6rem 0', backgroundColor: 'var(--bg-primary)' }}>
+    <div style={{ padding: '0.8rem 0', backgroundColor: 'var(--bg-primary)' }}>
       <div className="container">
         
         {/* Split Section: Bio & Profile Photo */}
@@ -77,19 +108,30 @@ const About = () => {
               I craft visual legacies for bold minds.
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', marginBottom: '1.5rem', fontWeight: 300, lineHeight: 1.7 }}>
-              Hello! I'm Alex, a creative director and multidisciplinary designer based in New York. With over 5 years of professional design experience, I specialize in transforming conceptual projects into highly engaging, modern visual assets.
+              {bioParagraph1}
             </p>
             <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', marginBottom: '2.5rem', fontWeight: 300, lineHeight: 1.7 }}>
-              My philosophy revolves around minimalism, high contrast, and grid-based composition. I believe a brand identity should not just represent a company, but command attention and make viewers stop scrolling. Whether it's a sleek logo, an intricate SaaS dashboard, or vector posters, I approach every project with raw artistic intent and absolute precision.
+              {bioParagraph2}
             </p>
             
-            <a 
-              href="#" 
-              onClick={(e) => { e.preventDefault(); alert('Resume PDF link goes here!'); }}
-              className="btn-primary"
-            >
-              <FaDownload /> Download Resume
-            </a>
+            {resumeUrl && resumeUrl !== '#' ? (
+              <a 
+                href={resumeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-primary"
+              >
+                <FaDownload /> Download Resume
+              </a>
+            ) : (
+              <a 
+                href="#" 
+                onClick={(e) => { e.preventDefault(); alert('Resume PDF not uploaded yet!'); }}
+                className="btn-primary"
+              >
+                <FaDownload /> Download Resume
+              </a>
+            )}
           </motion.div>
 
           {/* Portrait Column */}
@@ -121,7 +163,7 @@ const About = () => {
               }}
             >
               <img
-                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80"
+                src={portraitImage}
                 alt="Alex Portrait"
                 loading="lazy"
                 style={{

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaTimes, FaChevronLeft, FaChevronRight, FaSearchPlus } from 'react-icons/fa';
 
 const ProjectModal = ({ project, onClose }) => {
   if (!project) return null;
@@ -15,11 +15,18 @@ const ProjectModal = ({ project, onClose }) => {
     : [coverImage || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80'];
 
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isZoomed, setIsZoomed] = useState(false);
 
   // Keyboard navigation for gallery
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') {
+        if (isZoomed) {
+          setIsZoomed(false);
+        } else {
+          onClose();
+        }
+      }
       if (e.key === 'ArrowRight' && galleryImages.length > 1) {
         handleNext();
       }
@@ -29,7 +36,7 @@ const ProjectModal = ({ project, onClose }) => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentIndex, galleryImages]);
+  }, [currentIndex, galleryImages, isZoomed]);
 
   const handleNext = () => {
     setCurrentIndex((prev) => (prev === galleryImages.length - 1 ? 0 : prev + 1));
@@ -132,13 +139,49 @@ const ProjectModal = ({ project, onClose }) => {
               <img
                 src={galleryImages[currentIndex]}
                 alt={`${title} - ${currentIndex + 1}`}
+                onClick={() => setIsZoomed(true)}
                 style={{
                   maxWidth: '100%',
                   maxHeight: '450px',
                   objectFit: 'contain',
-                  borderRadius: '4px'
+                  borderRadius: '4px',
+                  cursor: 'zoom-in'
                 }}
               />
+
+              {/* Zoom Button */}
+              <button
+                onClick={() => setIsZoomed(true)}
+                style={{
+                  position: 'absolute',
+                  top: '1rem',
+                  right: '1rem',
+                  background: 'rgba(16, 16, 16, 0.7)',
+                  border: '1px solid var(--border)',
+                  borderRadius: '4px',
+                  width: '36px',
+                  height: '36px',
+                  color: '#ffffff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  zIndex: 6,
+                  fontSize: '0.9rem',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = 'var(--accent)';
+                  e.currentTarget.style.borderColor = 'var(--accent)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = '#ffffff';
+                  e.currentTarget.style.borderColor = 'var(--border)';
+                }}
+                title="View Fullscreen"
+              >
+                <FaSearchPlus />
+              </button>
 
               {/* Navigation Arrows */}
               {galleryImages.length > 1 && (
@@ -309,6 +352,70 @@ const ProjectModal = ({ project, onClose }) => {
           }
         `}</style>
       </motion.div>
+
+      {/* Immersive Fullscreen Lightbox */}
+      <AnimatePresence>
+        {isZoomed && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              backgroundColor: 'rgba(5, 5, 5, 0.98)',
+              zIndex: 2000,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              cursor: 'zoom-out'
+            }}
+            onClick={() => setIsZoomed(false)}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setIsZoomed(false)}
+              style={{
+                position: 'absolute',
+                top: '1.5rem',
+                right: '1.5rem',
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: 'none',
+                borderRadius: '50%',
+                width: '45px',
+                height: '45px',
+                color: '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                fontSize: '1.25rem',
+                zIndex: 2010
+              }}
+            >
+              <FaTimes />
+            </button>
+
+            {/* Immersive Image */}
+            <motion.img
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.95 }}
+              transition={{ duration: 0.25 }}
+              src={galleryImages[currentIndex]}
+              alt={`${title} fullscreen`}
+              style={{
+                maxWidth: '92vw',
+                maxHeight: '92vh',
+                objectFit: 'contain',
+                borderRadius: '4px',
+                cursor: 'default'
+              }}
+              onClick={(e) => e.stopPropagation()} // Prevent closing when clicking the image itself
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </AnimatePresence>
   );
 };

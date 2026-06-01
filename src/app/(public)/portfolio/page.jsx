@@ -42,7 +42,7 @@ const Portfolio = () => {
     : activeProjects.filter(p => p.category === selectedFilter);
 
   return (
-    <div style={{ padding: '5rem 0', backgroundColor: 'var(--bg-primary)', minHeight: '80vh' }}>
+    <div style={{ padding: '2rem 0', backgroundColor: 'var(--bg-primary)', minHeight: '80vh' }}>
       <div className="container">
         
         {/* Header */}

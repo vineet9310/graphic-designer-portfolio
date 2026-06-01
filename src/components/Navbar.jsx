@@ -5,11 +5,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSettings } from '@/hooks/useSettings';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
+  const { settings } = useSettings();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,12 +32,12 @@ const Navbar = () => {
   }, [pathname]);
 
   const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'Portfolio', path: '/portfolio' },
-    { name: 'About', path: '/about' },
-    { name: 'Services', path: '/services' },
-    { name: 'Contact', path: '/contact' }
-  ];
+    { name: 'Home', path: '/', visible: settings?.navbar?.home !== false },
+    { name: 'Portfolio', path: '/portfolio', visible: settings?.navbar?.portfolio !== false },
+    { name: 'About', path: '/about', visible: settings?.navbar?.about !== false },
+    { name: 'Services', path: '/services', visible: settings?.navbar?.services !== false },
+    { name: 'Contact', path: '/contact', visible: settings?.navbar?.contact !== false }
+  ].filter(link => link.visible);
 
   return (
     <>
@@ -47,7 +49,7 @@ const Navbar = () => {
           background: scrolled ? 'rgba(10, 10, 10, 0.85)' : 'transparent',
           backdropFilter: scrolled ? 'blur(10px)' : 'none',
           borderBottom: scrolled ? '1px solid var(--border)' : '1px solid transparent',
-          padding: '1.25rem 0',
+          padding: '0.5rem 0',
           transition: 'all 0.3s ease'
         }}
       >

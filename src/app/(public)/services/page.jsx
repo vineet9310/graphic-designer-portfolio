@@ -4,78 +4,115 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { FaPaintBrush, FaDraftingCompass, FaLaptopCode, FaBullhorn, FaCheck } from 'react-icons/fa';
 import Link from 'next/link';
+import { useSettings } from '@/hooks/useSettings';
 
 const Services = () => {
-  const serviceCards = [
-    {
-      icon: <FaPaintBrush />,
-      title: 'Logo Design',
-      description: 'Custom vector logo marks designed from scratch to reflect your core values and make a lasting corporate statement.',
-      includes: ['3 Unique Logo Concepts', 'Full Vector File Handover', 'Black & White Variations', 'Icon & Favicon Exports']
-    },
-    {
-      icon: <FaDraftingCompass />,
-      title: 'Brand Identity',
-      description: 'Comprehensive design guidelines and complete brand collateral that synchronize your visual appearance across all channels.',
-      includes: ['Brand Style Guide Booklet', 'Typography & Palette System', 'Business Card & Letterhead', 'Packaging Blueprints']
-    },
-    {
-      icon: <FaLaptopCode />,
-      title: 'UI/UX Design',
-      description: 'High-fidelity mobile and desktop dashboard layouts built in Figma. Structured to maximize readability and flow.',
-      includes: ['Figma Interaction Mockups', 'Component Design System', 'Wireframe Flow Schematics', 'Developer Handoff Spec']
-    },
-    {
-      icon: <FaBullhorn />,
-      title: 'Social Media Design',
-      description: 'Vibrant, high-contrast banner templates, product display grids, and promo vectors that amplify your digital campaigns.',
-      includes: ['12 Instagram Template Grids', 'LinkedIn & Twitter Banners', 'Click-through Banner Assets', 'Editable Source Files']
-    }
-  ];
+  const { settings, loading } = useSettings();
 
-  const packages = [
-    {
-      name: 'Basic Concept',
-      price: '$499',
-      description: 'Perfect for small boutiques or personal ventures looking to establish a minimal starter design.',
-      features: [
-        'Single Logo Concept',
-        'Basic Style Guidelines',
-        '2 Revision Iterations',
-        'Vector Source Files',
-        '3 Days Standard Delivery'
-      ],
-      featured: false
-    },
-    {
-      name: 'Full Identity',
-      price: '$1,299',
-      description: 'Complete branding suite tailored for active startups ready to compete globally.',
-      features: [
-        '3 Unique Logo Proposals',
-        'Full Branding Book (PDF)',
-        'Stationery & Business Cards',
-        'Unlimited Revision Iterations',
-        'Priority Slack Communication',
-        'Social Media Grid Template'
-      ],
-      featured: true // Highlights this middle package with red border
-    },
-    {
-      name: 'Premium UI + Brand',
-      price: '$2,499',
-      description: 'All-inclusive premium design packages combining branding guides and full app mockups.',
-      features: [
-        'Everything in Full Identity',
-        'Full UI/UX Web/App Design (Figma)',
-        'Design System Toolkit',
-        'Interactive Figma Prototypes',
-        '10-Pages Flow Mockup',
-        '1 Month Ongoing Post-Support'
-      ],
-      featured: false
-    }
-  ];
+  if (loading) {
+    return (
+      <div style={{ padding: '6rem 0', backgroundColor: 'var(--bg-primary)', minHeight: '80vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <div className="skeleton" style={{ width: '80px', height: '80px', borderRadius: '50%' }} />
+      </div>
+    );
+  }
+
+  // Helper to map icons dynamically based on index or title
+  const getServiceIcon = (title, idx) => {
+    const t = title.toLowerCase();
+    if (t.includes('logo')) return <FaPaintBrush />;
+    if (t.includes('brand') || t.includes('identity')) return <FaDraftingCompass />;
+    if (t.includes('ui') || t.includes('ux') || t.includes('web')) return <FaLaptopCode />;
+    if (t.includes('social') || t.includes('media') || t.includes('media')) return <FaBullhorn />;
+    
+    // Index mapping fallback
+    if (idx === 0) return <FaPaintBrush />;
+    if (idx === 1) return <FaDraftingCompass />;
+    if (idx === 2) return <FaLaptopCode />;
+    return <FaBullhorn />;
+  };
+
+  const serviceCards = settings?.services && settings.services.length > 0
+    ? settings.services
+        .filter(srv => srv.visible !== false)
+        .map((srv, idx) => ({
+          icon: getServiceIcon(srv.title, idx),
+          title: srv.title,
+          description: srv.description,
+          includes: srv.includes || []
+        }))
+    : [
+        {
+          icon: <FaPaintBrush />,
+          title: 'Logo Design',
+          description: 'Custom vector logo marks designed from scratch to reflect your core values and make a lasting corporate statement.',
+          includes: ['3 Unique Logo Concepts', 'Full Vector File Handover', 'Black & White Variations', 'Icon & Favicon Exports']
+        },
+        {
+          icon: <FaDraftingCompass />,
+          title: 'Brand Identity',
+          description: 'Comprehensive design guidelines and complete brand collateral that synchronize your visual appearance across all channels.',
+          includes: ['Brand Style Guide Booklet', 'Typography & Palette System', 'Business Card & Letterhead', 'Packaging Blueprints']
+        },
+        {
+          icon: <FaLaptopCode />,
+          title: 'UI/UX Design',
+          description: 'High-fidelity mobile and desktop dashboard layouts built in Figma. Structured to maximize readability and flow.',
+          includes: ['Figma Interaction Mockups', 'Component Design System', 'Wireframe Flow Schematics', 'Developer Handoff Spec']
+        },
+        {
+          icon: <FaBullhorn />,
+          title: 'Social Media Design',
+          description: 'Vibrant, high-contrast banner templates, product display grids, and promo vectors that amplify your digital campaigns.',
+          includes: ['12 Instagram Template Grids', 'LinkedIn & Twitter Banners', 'Click-through Banner Assets', 'Editable Source Files']
+        }
+      ];
+
+  const packages = settings?.packages && settings.packages.length > 0
+    ? settings.packages
+    : [
+        {
+          name: 'Basic Concept',
+          price: '$499',
+          description: 'Perfect for small boutiques or personal ventures looking to establish a minimal starter design.',
+          features: [
+            'Single Logo Concept',
+            'Basic Style Guidelines',
+            '2 Revision Iterations',
+            'Vector Source Files',
+            '3 Days Standard Delivery'
+          ],
+          featured: false
+        },
+        {
+          name: 'Full Identity',
+          price: '$1,299',
+          description: 'Complete branding suite tailored for active startups ready to compete globally.',
+          features: [
+            '3 Unique Logo Proposals',
+            'Full Branding Book (PDF)',
+            'Stationery & Business Cards',
+            'Unlimited Revision Iterations',
+            'Priority Slack Communication',
+            'Social Media Grid Template'
+          ],
+          featured: true // Highlights this middle package with red border
+        },
+        {
+          name: 'Premium UI + Brand',
+          price: '$2,499',
+          description: 'All-inclusive premium design packages combining branding guides and full app mockups.',
+          features: [
+            'Everything in Full Identity',
+            'Full UI/UX Web/App Design (Figma)',
+            'Design System Toolkit',
+            'Interactive Figma Prototypes',
+            '10-Pages Flow Mockup',
+            '1 Month Ongoing Post-Support'
+          ],
+          featured: false
+        }
+      ];
 
   return (
     <div style={{ padding: '6rem 0', backgroundColor: 'var(--bg-primary)' }}>

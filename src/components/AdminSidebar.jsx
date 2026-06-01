@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
-import { FaChartLine, FaFolderOpen, FaEnvelopeOpenText, FaSignOutAlt } from 'react-icons/fa';
+import { FaChartLine, FaFolderOpen, FaEnvelopeOpenText, FaSignOutAlt, FaSlidersH } from 'react-icons/fa';
 
 const AdminSidebar = () => {
   const { logout, adminEmail } = useAuth();
@@ -21,7 +21,8 @@ const AdminSidebar = () => {
   const menuItems = [
     { name: 'Dashboard', path: '/admin/dashboard', icon: <FaChartLine /> },
     { name: 'Projects', path: '/admin/projects', icon: <FaFolderOpen /> },
-    { name: 'Messages', path: '/admin/messages', icon: <FaEnvelopeOpenText /> }
+    { name: 'Messages', path: '/admin/messages', icon: <FaEnvelopeOpenText /> },
+    { name: 'Site Settings', path: '/admin/settings', icon: <FaSlidersH /> }
   ];
 
   return (
