@@ -11,19 +11,26 @@ const Services = () => {
 
   if (loading) {
     return (
-      <div style={{ padding: '6rem 0', backgroundColor: 'var(--bg-primary)', minHeight: '80vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <div className="skeleton" style={{ width: '80px', height: '80px', borderRadius: '50%' }} />
+      <div className="about-loading-container">
+        <div className="skeleton about-loading-skeleton" />
       </div>
     );
   }
 
   // Helper to map icons dynamically based on index or title
   const getServiceIcon = (title, idx) => {
+    if (!title || typeof title !== 'string') {
+      // Index mapping fallback
+      if (idx === 0) return <FaPaintBrush />;
+      if (idx === 1) return <FaDraftingCompass />;
+      if (idx === 2) return <FaLaptopCode />;
+      return <FaBullhorn />;
+    }
     const t = title.toLowerCase();
     if (t.includes('logo')) return <FaPaintBrush />;
     if (t.includes('brand') || t.includes('identity')) return <FaDraftingCompass />;
     if (t.includes('ui') || t.includes('ux') || t.includes('web')) return <FaLaptopCode />;
-    if (t.includes('social') || t.includes('media') || t.includes('media')) return <FaBullhorn />;
+    if (t.includes('social') || t.includes('media')) return <FaBullhorn />;
     
     // Index mapping fallback
     if (idx === 0) return <FaPaintBrush />;
@@ -37,8 +44,8 @@ const Services = () => {
         .filter(srv => srv.visible !== false)
         .map((srv, idx) => ({
           icon: getServiceIcon(srv.title, idx),
-          title: srv.title,
-          description: srv.description,
+          title: srv.title || 'Untitled Service',
+          description: srv.description || '',
           includes: srv.includes || []
         }))
     : [
@@ -96,7 +103,7 @@ const Services = () => {
             'Priority Slack Communication',
             'Social Media Grid Template'
           ],
-          featured: true // Highlights this middle package with red border
+          featured: true
         },
         {
           name: 'Premium UI + Brand',
@@ -115,31 +122,24 @@ const Services = () => {
       ];
 
   return (
-    <div style={{ padding: '6rem 0', backgroundColor: 'var(--bg-primary)' }}>
+    <div className="services-page">
       <div className="container">
         
         {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '5rem' }}>
-          <p style={{ color: 'var(--accent)', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
+        <div className="services-header">
+          <p className="section-subtitle">
             Services & Pricing
           </p>
-          <h1 style={{ fontSize: '3rem', fontFamily: 'var(--font-heading)', marginBottom: '1rem' }}>
+          <h1 className="section-title">
             How I Can Help You
           </h1>
-          <p style={{ color: 'var(--text-secondary)', maxWidth: '600px', margin: '0 auto', fontSize: '1.05rem', fontWeight: 300 }}>
+          <p className="section-description">
             Curated creative agency level services structured to elevate your aesthetic appearance and digital performance.
           </p>
         </div>
 
         {/* 1. Services Cards Grid */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-            gap: '2rem',
-            marginBottom: '7rem'
-          }}
-        >
+        <div className="services-grid">
           {serviceCards.map((service, index) => (
             <motion.div
               key={index}
@@ -147,46 +147,32 @@ const Services = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
-              className="card"
-              style={{ padding: '2.5rem 2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}
+              className="card service-card"
             >
               {/* Icon */}
-              <div
-                style={{
-                  color: 'var(--accent)',
-                  fontSize: '2rem',
-                  backgroundColor: 'rgba(230, 57, 70, 0.05)',
-                  width: '60px',
-                  height: '60px',
-                  borderRadius: '6px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  border: '1px solid rgba(230, 57, 70, 0.15)'
-                }}
-              >
+              <div className="service-icon-box">
                 {service.icon}
               </div>
 
               {/* Title & Description */}
               <div>
-                <h3 style={{ fontSize: '1.35rem', marginBottom: '0.75rem', fontFamily: 'var(--font-heading)' }}>
+                <h3 className="service-card-title">
                   {service.title}
                 </h3>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.6, fontWeight: 300 }}>
+                <p className="service-card-desc">
                   {service.description}
                 </p>
               </div>
 
               {/* What's Included */}
-              <div style={{ marginTop: 'auto', borderTop: '1px solid var(--border)', paddingTop: '1.25rem' }}>
-                <h4 style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--text-secondary)', letterSpacing: '0.05em', marginBottom: '0.75rem', fontWeight: 600 }}>
+              <div className="service-includes-wrapper">
+                <h4 className="service-includes-header">
                   Includes
                 </h4>
-                <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <ul className="service-includes-list">
                   {service.includes.map((inc, i) => (
-                    <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                      <FaCheck style={{ color: 'var(--accent)', fontSize: '0.7rem' }} />
+                    <li key={i} className="service-includes-item">
+                      <FaCheck className="service-includes-check" />
                       <span>{inc}</span>
                     </li>
                   ))}
@@ -197,24 +183,16 @@ const Services = () => {
         </div>
 
         {/* 2. Packages Grid */}
-        <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-          <h2 style={{ fontSize: '2.5rem', fontFamily: 'var(--font-heading)', marginBottom: '1rem' }}>
+        <div className="pricing-header">
+          <h2 className="pricing-title">
             Pricing Packages
           </h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', fontWeight: 300 }}>
+          <p className="pricing-description">
             Transparent budgets designed to support projects from quick concepts to comprehensive launches.
           </p>
         </div>
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: '2.5rem',
-            alignItems: 'stretch'
-          }}
-          className="pricing-grid"
-        >
+        <div className="pricing-grid">
           {packages.map((pkg, index) => (
             <motion.div
               key={index}
@@ -222,67 +200,43 @@ const Services = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="card"
-              style={{
-                padding: '3rem 2rem',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '2rem',
-                border: pkg.featured ? '2px solid var(--accent)' : '1px solid var(--border)',
-                position: 'relative'
-              }}
+              className={`card package-card ${pkg.featured ? 'featured' : ''}`}
             >
               {/* Highlight Tag */}
               {pkg.featured && (
-                <span
-                  style={{
-                    position: 'absolute',
-                    top: '0',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    backgroundColor: 'var(--accent)',
-                    color: '#ffffff',
-                    padding: '0.25rem 1rem',
-                    borderRadius: '20px',
-                    fontSize: '0.75rem',
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em'
-                  }}
-                >
+                <span className="package-badge">
                   Most Popular
                 </span>
               )}
 
               {/* Package Header */}
-              <div style={{ textAlign: 'center' }}>
-                <h3 style={{ fontSize: '1.5rem', color: 'var(--text-primary)', marginBottom: '0.5rem', fontFamily: 'var(--font-heading)' }}>
+              <div className="package-header">
+                <h3 className="package-title">
                   {pkg.name}
                 </h3>
-                <h4 style={{ fontSize: '3rem', fontWeight: 800, color: 'var(--text-primary)', fontFamily: 'var(--font-heading)', margin: '0.5rem 0' }}>
+                <h4 className="package-price">
                   {pkg.price}
                 </h4>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: 300, lineHeight: 1.5, minHeight: '45px' }}>
+                <p className="package-description">
                   {pkg.description}
                 </p>
               </div>
 
               {/* Features List */}
-              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '1rem', borderTop: '1px solid var(--border)', paddingTop: '2rem' }}>
-                {pkg.features.map((feature, i) => (
-                  <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                    <FaCheck style={{ color: 'var(--accent)', flexShrink: 0 }} />
+              <ul className="package-features-list">
+                {(pkg.features || []).map((feature, i) => (
+                  <li key={i} className="package-features-item">
+                    <FaCheck className="package-features-check" />
                     <span>{feature}</span>
                   </li>
                 ))}
               </ul>
 
               {/* Action Button */}
-              <div style={{ marginTop: 'auto', paddingTop: '1.5rem' }}>
+              <div className="package-action">
                 <Link
                   href="/contact"
-                  className={pkg.featured ? 'btn-primary' : 'btn-outline'}
-                  style={{ width: '100%', justifyContent: 'center' }}
+                  className={`${pkg.featured ? 'btn-primary' : 'btn-outline'} btn-full-width`}
                 >
                   Get Started
                 </Link>

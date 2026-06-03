@@ -65,64 +65,47 @@ const AdminDashboard = () => {
   }, []);
 
   const statCards = [
-    { title: 'Total Projects', value: stats.totalProjects, icon: <FaFolderOpen />, color: 'var(--accent)' },
-    { title: 'Featured Projects', value: stats.featuredProjects, icon: <FaStar />, color: 'var(--accent)' },
-    { title: 'Unread Messages', value: stats.unreadMessages, icon: <FaEnvelopeOpenText />, color: 'var(--accent)' },
-    { title: 'Last Upload', value: stats.lastUploadDate, icon: <FaCalendarAlt />, color: 'var(--text-secondary)' }
+    { title: 'Total Projects', value: stats.totalProjects, icon: <FaFolderOpen />, isText: false },
+    { title: 'Featured Projects', value: stats.featuredProjects, icon: <FaStar />, isText: false },
+    { title: 'Unread Messages', value: stats.unreadMessages, icon: <FaEnvelopeOpenText />, isText: false },
+    { title: 'Last Upload', value: stats.lastUploadDate, icon: <FaCalendarAlt />, isText: true }
   ];
 
   return (
-    <div style={{ width: '100%' }}>
+    <div className="admin-dashboard-container">
       {/* Header */}
-      <div style={{ marginBottom: '3rem' }}>
-        <h1 style={{ fontSize: '2.25rem', fontFamily: 'var(--font-heading)', marginBottom: '0.5rem' }}>
+      <div className="dashboard-header">
+        <h1 className="dashboard-h1">
           Dashboard Overview
         </h1>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
+        <p className="dashboard-subtitle">
           Quick analytics, upload stats, and recent messages list.
         </p>
       </div>
 
       {loading ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
+        <div className="dashboard-stats-grid">
           {[1, 2, 3, 4].map((n) => (
-            <div key={n} className="card" style={{ height: '140px' }}>
-              <div className="skeleton" style={{ height: '100%', width: '100%' }} />
+            <div key={n} className="card admin-loading-card">
+              <div className="skeleton admin-loading-skeleton" />
             </div>
           ))}
         </div>
       ) : (
         <>
           {/* Stats Cards Grid */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-              gap: '1.5rem',
-              marginBottom: '4rem'
-            }}
-          >
+          <div className="dashboard-stats-grid">
             {statCards.map((card, i) => (
-              <div
-                key={i}
-                className="card"
-                style={{
-                  padding: '1.75rem',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  minHeight: '130px',
-                  position: 'relative',
-                  overflow: 'hidden'
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                  <span style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--text-secondary)', fontWeight: 600, letterSpacing: '0.05em' }}>
+              <div key={i} className="dashboard-stat-card">
+                <div className="dashboard-stat-header">
+                  <span className="dashboard-stat-title">
                     {card.title}
                   </span>
-                  <span style={{ fontSize: '1.25rem', color: card.color }}>{card.icon}</span>
+                  <span className={card.isText ? 'dashboard-stat-icon-secondary' : 'dashboard-stat-icon'}>
+                    {card.icon}
+                  </span>
                 </div>
-                <div style={{ fontSize: card.title === 'Last Upload' ? '1.25rem' : '2.25rem', fontWeight: 700, fontFamily: 'var(--font-heading)', marginTop: '0.5rem' }}>
+                <div className={card.isText ? 'dashboard-stat-value-text' : 'dashboard-stat-value'}>
                   {card.value}
                 </div>
               </div>
@@ -130,42 +113,34 @@ const AdminDashboard = () => {
           </div>
 
           {/* Split layout: Recent Messages snippet */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '3rem' }} className="dashboard-split">
+          <div className="dashboard-split-layout">
             {/* Recent Messages */}
             <div>
-              <h2 style={{ fontSize: '1.35rem', fontFamily: 'var(--font-heading)', marginBottom: '1.5rem' }}>
+              <h2 className="dashboard-column-title">
                 Recent Messages
               </h2>
               
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div className="dashboard-messages-list">
                 {recentMessages.length === 0 ? (
-                  <div className="card" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                  <div className="dashboard-message-card-empty">
                     No messages received yet.
                   </div>
                 ) : (
                   recentMessages.map((msg) => (
                     <div
                       key={msg._id}
-                      className="card"
-                      style={{
-                        padding: '1.5rem',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '0.5rem',
-                        position: 'relative',
-                        borderLeft: !msg.isRead ? '3px solid var(--accent)' : '1px solid var(--border)'
-                      }}
+                      className={`dashboard-message-card ${!msg.isRead ? 'unread' : ''}`}
                     >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontWeight: 600, fontSize: '0.95rem' }}>{msg.name}</span>
-                        <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                      <div className="dashboard-message-header">
+                        <span className="dashboard-message-sender">{msg.name}</span>
+                        <span className="dashboard-message-date">
                           {new Date(msg.createdAt).toLocaleDateString()}
                         </span>
                       </div>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--accent)', fontWeight: 500 }}>
+                      <div className="dashboard-message-subject">
                         Subject: {msg.subject || 'General Inquiry'}
                       </div>
-                      <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <p className="dashboard-message-body">
                         {msg.message}
                       </p>
                     </div>
@@ -176,21 +151,19 @@ const AdminDashboard = () => {
 
             {/* Quick Actions Panel */}
             <div>
-              <h2 style={{ fontSize: '1.35rem', fontFamily: 'var(--font-heading)', marginBottom: '1.5rem' }}>
+              <h2 className="dashboard-column-title">
                 Quick Actions
               </h2>
-              <div className="card" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div className="dashboard-actions-card">
                 <Link
                   href="/admin/projects"
-                  className="btn-primary"
-                  style={{ width: '100%', justifyContent: 'center' }}
+                  className="btn-primary dashboard-action-btn-w-full"
                 >
                   Upload New Project
                 </Link>
                 <Link
                   href="/admin/messages"
-                  className="btn-outline"
-                  style={{ width: '100%', justifyContent: 'center' }}
+                  className="btn-outline dashboard-action-btn-w-full"
                 >
                   Review Inbox
                 </Link>
@@ -199,15 +172,6 @@ const AdminDashboard = () => {
           </div>
         </>
       )}
-
-      <style>{`
-        @media (max-width: 850px) {
-          .dashboard-split {
-            grid-template-columns: 1fr !important;
-            gap: 2.5rem !important;
-          }
-        }
-      `}</style>
     </div>
   );
 };

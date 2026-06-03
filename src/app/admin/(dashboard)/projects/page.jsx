@@ -225,14 +225,14 @@ const AdminProjects = () => {
   };
 
   return (
-    <div style={{ width: '100%' }}>
+    <div className="admin-dashboard-container">
       {/* Header Summary Row */}
-      <div style={{ marginBottom: '3rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="admin-flex-row-sb">
         <div>
-          <h1 style={{ fontSize: '2.25rem', fontFamily: 'var(--font-heading)', marginBottom: '0.5rem' }}>
+          <h1 className="admin-h1">
             Manage Projects
           </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
+          <p className="admin-header-p">
             Add, update, and sort work inside your portfolio catalog.
           </p>
         </div>
@@ -243,13 +243,13 @@ const AdminProjects = () => {
 
       {/* Projects List Table */}
       {loading ? (
-        <div className="card" style={{ height: '300px' }}>
-          <div className="skeleton" style={{ height: '100%', width: '100%' }} />
+        <div className="card admin-loading-card">
+          <div className="skeleton admin-loading-skeleton" />
         </div>
       ) : (
-        <div className="card" style={{ overflowX: 'auto', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)' }}>
+        <div className="card admin-table-card">
           {projects.length === 0 ? (
-            <div style={{ padding: '4rem 2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
+            <div className="admin-card-empty">
               No projects uploaded yet. Start by uploading one!
             </div>
           ) : (
@@ -259,72 +259,60 @@ const AdminProjects = () => {
                   <th>Cover</th>
                   <th>Title</th>
                   <th>Category</th>
-                  <th style={{ textAlign: 'center' }}>Featured</th>
-                  <th style={{ textAlign: 'center' }}>Order</th>
-                  <th style={{ textAlign: 'right' }}>Actions</th>
+                  <th className="admin-table-align-center">Featured</th>
+                  <th className="admin-table-align-center">Order</th>
+                  <th className="admin-table-align-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {projects.map((project) => (
                   <tr key={project._id}>
                     {/* Image Thumbnail */}
-                    <td style={{ width: '80px' }}>
+                    <td className="admin-table-w-80">
                       <img
                         src={project.coverImage || 'https://via.placeholder.com/60'}
                         alt={project.title}
-                        style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px', border: '1px solid var(--border)' }}
+                        className="admin-table-thumbnail"
                         loading="lazy"
                       />
                     </td>
 
                     {/* Title */}
-                    <td style={{ fontWeight: 600, fontSize: '0.95rem' }}>{project.title}</td>
+                    <td className="admin-table-text-bold">{project.title}</td>
 
                     {/* Category */}
-                    <td style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{project.category}</td>
+                    <td className="admin-table-text-secondary">{project.category}</td>
 
                     {/* Featured Toggle */}
-                    <td style={{ textAlign: 'center' }}>
+                    <td className="admin-table-align-center">
                       <button
                         onClick={(e) => handleToggleFeatured(project, e)}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          cursor: 'pointer',
-                          color: project.featured ? 'var(--accent)' : 'var(--text-secondary)',
-                          fontSize: '1.1rem',
-                          display: 'inline-flex',
-                          alignItems: 'center'
-                        }}
+                        className={`admin-btn-star-featured ${project.featured ? 'admin-btn-star-featured-active' : 'admin-btn-star-featured-inactive'}`}
                         title={project.featured ? 'Unfeature project' : 'Feature project'}
                       >
-                        <FaStar style={{ fill: project.featured ? 'var(--accent)' : 'none', stroke: 'currentColor', strokeWidth: '30px' }} />
+                        <FaStar className="admin-star-icon" />
                       </button>
                     </td>
 
                     {/* Order Value */}
-                    <td style={{ textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                    <td className="admin-table-align-center admin-table-text-secondary">
                       {project.order || 0}
                     </td>
 
                     {/* Actions */}
-                    <td style={{ textAlign: 'right' }}>
-                      <div style={{ display: 'inline-flex', gap: '1rem' }}>
+                    <td className="admin-table-align-right">
+                      <div className="admin-icon-wrapper">
                         <button
                           onClick={() => handleEditClick(project)}
-                          style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1rem' }}
+                          className="admin-btn-icon-only"
                           title="Edit"
-                          onMouseEnter={e => e.currentTarget.style.color = 'var(--text-primary)'}
-                          onMouseLeave={e => e.currentTarget.style.color = 'var(--text-secondary)'}
                         >
                           <FaEdit />
                         </button>
                         <button
                           onClick={() => handleDeleteClick(project)}
-                          style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontSize: '1rem' }}
+                          className="admin-btn-delete"
                           title="Delete"
-                          onMouseEnter={e => e.currentTarget.style.color = 'var(--accent-hover)'}
-                          onMouseLeave={e => e.currentTarget.style.color = 'var(--accent)'}
                         >
                           <FaTrashAlt />
                         </button>
@@ -340,49 +328,26 @@ const AdminProjects = () => {
 
       {/* Modal Form Overlay */}
       {isFormOpen && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            backgroundColor: 'rgba(10, 10, 10, 0.95)',
-            zIndex: 500,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: '2rem'
-          }}
-        >
-          <div
-            className="card"
-            style={{
-              width: '100%',
-              maxWidth: '750px',
-              maxHeight: '90vh',
-              overflowY: 'auto',
-              backgroundColor: 'var(--bg-card)',
-              border: '1px solid var(--border)',
-              borderRadius: '8px',
-              padding: '2.5rem'
-            }}
-          >
+        <div className="admin-modal-overlay">
+          <div className="admin-modal-content">
             {/* Form Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-              <h2 style={{ fontSize: '1.5rem', fontFamily: 'var(--font-heading)' }}>
+            <div className="admin-modal-header">
+              <h2 className="admin-modal-h2">
                 {editMode ? 'Edit Project' : 'Upload New Project'}
               </h2>
               <button
                 onClick={handleCloseForm}
-                style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.25rem' }}
+                className="admin-modal-close-btn"
               >
                 <FaTimes />
               </button>
             </div>
 
             {/* Form fields */}
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <form onSubmit={handleSubmit} className="admin-form">
               
               {/* Title & Category Row */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }} className="form-grid">
+              <div className="admin-form-row">
                 <div className="form-group">
                   <label htmlFor="title" className="form-label">Project Title</label>
                   <input
@@ -437,28 +402,16 @@ const AdminProjects = () => {
                   placeholder="Figma, Illustrator, After Effects..."
                 />
                 {/* Tag List */}
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
+                <div className="admin-tag-container">
                   {tools.map((tool, idx) => (
-                    <span
-                      key={idx}
-                      style={{
-                        backgroundColor: 'var(--bg-surface)',
-                        border: '1px solid var(--border)',
-                        padding: '0.25rem 0.65rem',
-                        borderRadius: '4px',
-                        fontSize: '0.8rem',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.5rem'
-                      }}
-                    >
+                    <span key={idx} className="admin-tag-pill">
                       {tool}
                       <button
                         type="button"
                         onClick={() => removeTool(idx)}
-                        style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', padding: 0 }}
+                        className="admin-tag-delete-btn"
                       >
-                        <FaTimes style={{ fontSize: '0.7rem' }} />
+                        <FaTimes className="blogs-icon-arrow" />
                       </button>
                     </span>
                   ))}
@@ -470,28 +423,12 @@ const AdminProjects = () => {
                 <label className="form-label">Project Images (Up to 10 files. First will be cover)</label>
                 
                 {/* Drag/Drop Box */}
-                <label
-                  style={{
-                    border: '2px dashed var(--border)',
-                    borderRadius: '6px',
-                    padding: '2rem',
-                    textAlign: 'center',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '0.75rem',
-                    transition: 'border-color 0.2s',
-                    backgroundColor: 'var(--bg-surface)'
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--accent)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
-                >
-                  <FaUpload style={{ fontSize: '1.75rem', color: 'var(--text-secondary)' }} />
-                  <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                <label className="admin-project-upload-box">
+                  <FaUpload className="admin-project-upload-icon" />
+                  <span className="admin-project-upload-text">
                     Click to choose or drag images here
                   </span>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', opacity: 0.7 }}>
+                  <span className="admin-project-upload-subtext">
                     Supports JPEG, JPG, PNG, WEBP (Max 10MB)
                   </span>
                   <input
@@ -499,65 +436,36 @@ const AdminProjects = () => {
                     multiple
                     accept="image/*"
                     onChange={handleImageChange}
-                    style={{ display: 'none' }}
+                    className="admin-project-upload-input"
                   />
                 </label>
 
                 {/* Previews Collection */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '1rem', marginTop: '1.5rem' }} className="image-previews">
-                  
+                <div className="admin-project-previews-grid">
                   {/* Existing Images (loaded during Edit) */}
                   {existingImages.map((imgUrl, idx) => (
-                    <div key={`exist-${idx}`} style={{ position: 'relative', height: '80px', borderRadius: '4px', overflow: 'hidden', border: '1px solid var(--border)' }}>
-                      <img src={imgUrl} alt="Existing Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <div key={`exist-${idx}`} className="admin-project-preview-item">
+                      <img src={imgUrl} alt="Existing Preview" className="admin-project-preview-img" />
                       <button
                         type="button"
                         onClick={() => removeExistingImage(imgUrl)}
-                        style={{
-                          position: 'absolute',
-                          top: '4px',
-                          right: '4px',
-                          backgroundColor: 'rgba(10, 10, 10, 0.8)',
-                          color: 'var(--accent)',
-                          border: 'none',
-                          borderRadius: '50%',
-                          width: '20px',
-                          height: '20px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          cursor: 'pointer'
-                        }}
+                        className="admin-project-preview-remove-btn"
                       >
-                        <FaTimes style={{ fontSize: '0.7rem' }} />
+                        <FaTimes className="blogs-icon-arrow" />
                       </button>
                     </div>
                   ))}
 
                   {/* New Upload Previews */}
                   {newImagePreviews.map((previewUrl, idx) => (
-                    <div key={`new-${idx}`} style={{ position: 'relative', height: '80px', borderRadius: '4px', overflow: 'hidden', border: '1px solid var(--accent)' }}>
-                      <img src={previewUrl} alt="New Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <div key={`new-${idx}`} className="admin-project-preview-item new-upload">
+                      <img src={previewUrl} alt="New Preview" className="admin-project-preview-img" />
                       <button
                         type="button"
                         onClick={() => removeNewImagePreview(idx)}
-                        style={{
-                          position: 'absolute',
-                          top: '4px',
-                          right: '4px',
-                          backgroundColor: 'rgba(10, 10, 10, 0.8)',
-                          color: 'var(--accent)',
-                          border: 'none',
-                          borderRadius: '50%',
-                          width: '20px',
-                          height: '20px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          cursor: 'pointer'
-                        }}
+                        className="admin-project-preview-remove-btn"
                       >
-                        <FaTimes style={{ fontSize: '0.7rem' }} />
+                        <FaTimes className="blogs-icon-arrow" />
                       </button>
                     </div>
                   ))}
@@ -565,16 +473,16 @@ const AdminProjects = () => {
               </div>
 
               {/* Featured & Order Row */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', alignItems: 'center' }} className="form-grid">
-                <div className="form-group" style={{ flexDirection: 'row', alignItems: 'center', height: '100%', gap: '1rem', cursor: 'pointer' }}>
+              <div className="admin-form-row">
+                <div className="admin-checkbox-group">
                   <input
                     type="checkbox"
                     id="featured"
                     checked={featured}
                     onChange={(e) => setFeatured(e.target.checked)}
-                    style={{ width: '18px', height: '18px', accentColor: 'var(--accent)' }}
+                    className="admin-checkbox-input"
                   />
-                  <label htmlFor="featured" className="form-label" style={{ marginBottom: 0, cursor: 'pointer' }}>
+                  <label htmlFor="featured" className="admin-checkbox-label">
                     Mark as Featured Project
                   </label>
                 </div>
@@ -593,11 +501,18 @@ const AdminProjects = () => {
               </div>
 
               {/* Actions bottom */}
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1.5rem', borderTop: '1px solid var(--border)', paddingTop: '1.5rem' }}>
-                <button type="button" onClick={handleCloseForm} className="btn-outline" style={{ padding: '0.7rem 1.5rem' }}>
+              <div className="admin-form-actions">
+                <button
+                  type="button"
+                  onClick={handleCloseForm}
+                  className="btn-outline admin-form-actions-btn-cancel"
+                >
                   Cancel
                 </button>
-                <button type="submit" className="btn-primary" style={{ padding: '0.7rem 2rem' }}>
+                <button
+                  type="submit"
+                  className="btn-primary admin-form-actions-btn-submit"
+                >
                   {editMode ? 'Save Changes' : 'Upload Project'}
                 </button>
               </div>
@@ -606,17 +521,6 @@ const AdminProjects = () => {
           </div>
         </div>
       )}
-
-      <style>{`
-        @media (max-width: 768px) {
-          .form-grid {
-            grid-template-columns: 1fr !important;
-          }
-          .image-previews {
-            grid-template-columns: repeat(3, 1fr) !important;
-          }
-        }
-      `}</style>
     </div>
   );
 };

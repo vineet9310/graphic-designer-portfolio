@@ -3,7 +3,7 @@ import { AuthProvider } from '@/context/AuthContext';
 import { Toaster } from 'react-hot-toast';
 
 export const metadata = {
-  title: 'Alex | Graphic & Brand Designer Portfolio',
+  title: 'VividForge | Premium Graphic & Brand Design Portfolio',
   description: 'Premium visual identities, digital products, and high-impact designs for bold brands.',
 };
 

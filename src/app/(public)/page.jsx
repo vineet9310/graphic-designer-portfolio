@@ -6,14 +6,17 @@ import { motion } from 'framer-motion';
 import { useProjects } from '@/hooks/useProjects';
 import { useSettings } from '@/hooks/useSettings';
 import ProjectCard from '@/components/ProjectCard';
+import { useBlogs } from '@/hooks/useBlogs';
 
 const Home = () => {
   const { featuredProjects, loading: projectsLoading, fetchFeaturedProjects } = useProjects();
   const { settings, loading: settingsLoading } = useSettings();
+  const { blogs, fetchBlogs } = useBlogs();
 
   useEffect(() => {
     fetchFeaturedProjects();
-  }, [fetchFeaturedProjects]);
+    fetchBlogs({ limit: 3 });
+  }, [fetchFeaturedProjects, fetchBlogs]);
 
   // Fallback defaults in case settings is still loading/empty
   const toolsList = settings?.tools && settings.tools.length > 0 
@@ -36,20 +39,48 @@ const Home = () => {
   const heroTitle = settings?.hero?.title || 'I design things that make people stop scrolling.';
   const heroDescription = settings?.hero?.description || 'Crafting premium visual identities, digital products, and high-impact designs for bold brands worldwide.';
 
+  const mockHomeBlogs = [
+    {
+      _id: 'b1',
+      title: 'The Psychology of Color in Visual Brand Identity',
+      slug: 'psychology-of-color-brand-identity',
+      excerpt: 'How choice of palette impacts user subconsciousness. A deep dive into selecting colors that evoke trust, passion, and premium brand status.',
+      category: 'Branding',
+      coverImage: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=800&auto=format&fit=crop&q=80',
+      readingTime: '5 min read',
+      createdAt: '2026-05-15T09:00:00.000Z'
+    },
+    {
+      _id: 'b2',
+      title: 'Typography Rules: Why Space Grotesk dominates Modern Web Design',
+      slug: 'typography-rules-space-grotesk',
+      excerpt: 'Exploring the history and proportions of Space Grotesk. Learn how geometric layouts and sans-serif spacing amplify layout structures and visual margins.',
+      category: 'Typography',
+      coverImage: 'https://images.unsplash.com/photo-1561070791-26c113006238?w=800&auto=format&fit=crop&q=80',
+      readingTime: '4 min read',
+      createdAt: '2026-05-02T10:30:00.000Z'
+    },
+    {
+      _id: 'b3',
+      title: 'Neo-Futurism: Designing Dashboard Interfaces for the Next Generation',
+      slug: 'neo-futurism-dashboard-ui-ux',
+      excerpt: 'Case study in designing high-contrast dashboard systems. Balanced dark themes, bright borders, and component cards that maximize data density without visual clutter.',
+      category: 'UI/UX Insights',
+      coverImage: 'https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=800&auto=format&fit=crop&q=80',
+      readingTime: '7 min read',
+      createdAt: '2026-04-18T14:15:00.000Z'
+    }
+  ];
+
+  const homeBlogs = blogs && blogs.length > 0 ? blogs.slice(0, 3) : mockHomeBlogs;
+
   return (
-    <div style={{ backgroundColor: 'var(--bg-primary)', overflow: 'hidden' }}>
+    <div className="home-page">
       
       {/* 1. HERO SECTION */}
-      <section
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          position: 'relative',
-          padding: '3rem 0'
-        }}
-      >
+      <section className="hero-section">
         {/* Animated Background Shapes */}
-        <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+        <div className="hero-bg-shapes">
           {[...Array(15)].map((_, i) => (
             <motion.div
               key={i}
@@ -63,46 +94,21 @@ const Home = () => {
                 repeat: Infinity,
                 ease: 'easeInOut'
               }}
-              style={{
-                position: 'absolute',
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                width: `${Math.random() * 6 + 4}px`,
-                height: `${Math.random() * 6 + 4}px`,
-                borderRadius: '50%',
-                backgroundColor: 'var(--accent)',
-                filter: 'blur(1px)'
-              }}
+              className="hero-particle"
             />
           ))}
           
           {/* Subtle Accent Glow */}
-          <div style={{
-            position: 'absolute',
-            bottom: '10%',
-            right: '-10%',
-            width: '450px',
-            height: '450px',
-            borderRadius: '50%',
-            backgroundColor: 'rgba(230, 57, 70, 0.04)',
-            filter: 'blur(80px)'
-          }} />
+          <div className="hero-glow" />
         </div>
 
-        <div className="container" style={{ position: 'relative', zIndex: 2 }}>
-          <div style={{ maxWidth: '800px' }}>
+        <div className="container hero-content-wrapper">
+          <div className="hero-content-box">
             <motion.p
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              style={{
-                color: 'var(--accent)',
-                fontWeight: 600,
-                letterSpacing: '0.15em',
-                textTransform: 'uppercase',
-                fontSize: '0.9rem',
-                marginBottom: '1rem'
-              }}
+              className="hero-subtitle"
             >
               {heroSubtitle}
             </motion.p>
@@ -111,12 +117,7 @@ const Home = () => {
               initial={{ opacity: 0, y: 25 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              style={{
-                fontSize: 'clamp(2.5rem, 6.5vw, 4.5rem)',
-                lineHeight: 1.1,
-                marginBottom: '1.5rem',
-                fontFamily: 'var(--font-heading)'
-              }}
+              className="hero-title"
             >
               {heroTitle}
             </motion.h1>
@@ -125,13 +126,7 @@ const Home = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              style={{
-                fontSize: 'clamp(1rem, 2vw, 1.25rem)',
-                color: 'var(--text-secondary)',
-                marginBottom: '2.5rem',
-                fontWeight: 300,
-                maxWidth: '600px'
-              }}
+              className="hero-description"
             >
               {heroDescription}
             </motion.p>
@@ -140,7 +135,7 @@ const Home = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap' }}
+              className="hero-actions"
             >
               <Link href="/portfolio" className="btn-primary">
                 View Portfolio
@@ -154,19 +149,14 @@ const Home = () => {
       </section>
 
       {/* 2. FEATURED PROJECTS SECTION */}
-      <section style={{ padding: '6rem 0', backgroundColor: 'var(--bg-secondary)', borderTop: '1px solid var(--border)' }}>
+      <section className="featured-projects-section">
         <div className="container">
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-end',
-            marginBottom: '3.5rem'
-          }}>
+          <div className="featured-header">
             <div>
-              <p style={{ color: 'var(--accent)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', fontSize: '0.8rem', marginBottom: '0.5rem' }}>
+              <p className="featured-subtitle">
                 Selected Work
               </p>
-              <h2 style={{ fontSize: '2.5rem', fontFamily: 'var(--font-heading)' }}>Featured Projects</h2>
+              <h2 className="featured-title">Featured Projects</h2>
             </div>
             <Link href="/portfolio" className="btn-text">
               All Projects
@@ -174,17 +164,13 @@ const Home = () => {
           </div>
 
           {(projectsLoading || settingsLoading) ? (
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
-              gap: '2rem'
-            }}>
+            <div className="projects-grid">
               {[1, 2, 3].map((n) => (
-                <div key={n} className="card" style={{ height: '380px' }}>
-                  <div className="skeleton" style={{ height: '70%' }} />
-                  <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                    <div className="skeleton" style={{ height: '15px', width: '25%' }} />
-                    <div className="skeleton" style={{ height: '25px', width: '60%' }} />
+                <div key={n} className="card">
+                  <div className="skeleton skeleton-card-img-height" />
+                  <div className="skeleton-card-body">
+                    <div className="skeleton skeleton-card-line-small" />
+                    <div className="skeleton skeleton-card-line-large" />
                   </div>
                 </div>
               ))}
@@ -193,11 +179,7 @@ const Home = () => {
             <>
               {featuredProjects.length === 0 ? (
                 // Safe Mock Showcase in case database is empty so home page is beautiful out-of-the-box
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
-                  gap: '2rem'
-                }}>
+                <div className="projects-grid">
                   {[
                     { _id: 'm1', title: 'Aether Brand Identity', category: 'Branding', coverImage: 'https://images.unsplash.com/photo-1522542550221-31fd19575a2d?w=800&auto=format&fit=crop&q=80', description: 'Rebranding concept for tech platform.' },
                     { _id: 'm2', title: 'Zenith UI/UX Platform', category: 'UI/UX', coverImage: 'https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=800&auto=format&fit=crop&q=80', description: 'SaaS product design and dashboard layouts.' },
@@ -207,11 +189,7 @@ const Home = () => {
                   ))}
                 </div>
               ) : (
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
-                  gap: '2rem'
-                }}>
+                <div className="projects-grid">
                   {featuredProjects.slice(0, 3).map((project) => (
                     <ProjectCard key={project._id} project={project} />
                   ))}
@@ -223,14 +201,8 @@ const Home = () => {
       </section>
 
       {/* 3. SKILLS STRIP SECTION */}
-      <section style={{
-        padding: '3rem 0',
-        backgroundColor: 'var(--bg-primary)',
-        borderTop: '1px solid var(--border)',
-        borderBottom: '1px solid var(--border)',
-        position: 'relative'
-      }}>
-        <div style={{ width: '100%', overflow: 'hidden' }}>
+      <section className="skills-strip-section">
+        <div className="skills-marquee-container">
           <motion.div
             animate={{ x: [0, -1000] }}
             transition={{
@@ -241,31 +213,16 @@ const Home = () => {
                 ease: 'linear'
               }
             }}
-            style={{
-              display: 'flex',
-              gap: '4rem',
-              alignItems: 'center',
-              width: 'max-content',
-              paddingRight: '4rem'
-            }}
+            className="skills-marquee"
           >
             {/* Duplicated list to create infinite marquee effect */}
             {[...toolsList, ...toolsList, ...toolsList].map((tool, i) => (
               <div
                 key={i}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '1rem',
-                  fontSize: '1.25rem',
-                  fontWeight: 600,
-                  color: 'var(--text-secondary)',
-                  letterSpacing: '0.02em',
-                  fontFamily: 'var(--font-heading)'
-                }}
+                className="skills-marquee-item"
               >
                 <span>{tool}</span>
-                <span style={{ color: 'var(--accent)', fontSize: '1.5rem' }}>&bull;</span>
+                <span className="skills-marquee-bullet">&bull;</span>
               </div>
             ))}
           </motion.div>
@@ -273,14 +230,9 @@ const Home = () => {
       </section>
 
       {/* 4. STATS SECTION */}
-      <section style={{ padding: '6rem 0', backgroundColor: 'var(--bg-primary)' }}>
+      <section className="stats-section">
         <div className="container">
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '3rem',
-            textAlign: 'center'
-          }}>
+          <div className="stats-grid">
             {stats.map((stat, index) => (
               <motion.div
                 key={index}
@@ -288,28 +240,12 @@ const Home = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                style={{
-                  padding: '1.5rem',
-                  borderRight: index < 3 ? '1px solid var(--border)' : 'none'
-                }}
                 className="stat-card"
               >
-                <h3 style={{
-                  fontSize: 'clamp(2.5rem, 5vw, 3.5rem)',
-                  fontWeight: 700,
-                  color: 'var(--text-primary)',
-                  fontFamily: 'var(--font-heading)',
-                  marginBottom: '0.5rem'
-                }}>
+                <h3 className="stat-value">
                   {stat.value}
                 </h3>
-                <p style={{
-                  color: 'var(--text-secondary)',
-                  fontSize: '0.9rem',
-                  fontWeight: 500,
-                  letterSpacing: '0.05em',
-                  textTransform: 'uppercase'
-                }}>
+                <p className="stat-label">
                   {stat.label}
                 </p>
               </motion.div>
@@ -318,31 +254,80 @@ const Home = () => {
         </div>
       </section>
 
+      {/* 4.5. LATEST BLOGS SECTION */}
+      <section className="featured-projects-section">
+        <div className="container">
+          <div className="featured-header">
+            <div>
+              <p className="featured-subtitle">
+                Journal
+              </p>
+              <h2 className="featured-title">Latest Insights</h2>
+            </div>
+            <Link href="/blogs" className="btn-text">
+              View All Articles
+            </Link>
+          </div>
+
+          <div className="blogs-grid">
+            {homeBlogs.map((blog) => (
+              <motion.div
+                key={blog._id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                className="blog-card"
+              >
+                <div className="blog-card-img-box">
+                  <Link href={`/blogs/${blog.slug}`}>
+                    <img
+                      src={blog.coverImage}
+                      alt={blog.title}
+                      loading="lazy"
+                      className="blog-card-image"
+                    />
+                  </Link>
+                </div>
+                <div className="blog-card-content">
+                  <div className="blog-card-meta">
+                    <span className="blog-card-category">{blog.category}</span>
+                    <span className="blog-card-dot">&bull;</span>
+                    <span className="blog-card-date">{new Date(blog.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                  </div>
+                  <Link href={`/blogs/${blog.slug}`}>
+                    <h3 className="blog-card-title">
+                      {blog.title}
+                    </h3>
+                  </Link>
+                  <p className="blog-card-excerpt">
+                    {blog.excerpt}
+                  </p>
+                  <div className="blog-card-footer">
+                    <Link href={`/blogs/${blog.slug}`} className="blog-card-readmore">
+                      Read Article
+                    </Link>
+                    <span className="blog-card-read-time">
+                      {blog.readingTime}
+                    </span>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* 5. CTA SECTION */}
-      <section style={{ position: 'relative', overflow: 'hidden' }}>
-        <div
-          style={{
-            backgroundColor: 'var(--accent)',
-            padding: '6rem 0',
-            textAlign: 'center',
-            position: 'relative',
-            zIndex: 2
-          }}
-        >
-          <div className="container" style={{ maxWidth: '700px' }}>
+      <section className="cta-section">
+        <div className="cta-container">
+          <div className="cta-inner">
             <motion.h2
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
-              style={{
-                fontSize: 'clamp(2rem, 5vw, 3.25rem)',
-                color: '#ffffff',
-                fontFamily: 'var(--font-heading)',
-                fontWeight: 800,
-                marginBottom: '1.5rem',
-                lineHeight: 1.1
-              }}
+              className="cta-title"
             >
               Ready to work together?
             </motion.h2>
@@ -351,31 +336,18 @@ const Home = () => {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              style={{
-                fontSize: '1.1rem',
-                color: 'rgba(255, 255, 255, 0.8)',
-                marginBottom: '2.5rem',
-                fontWeight: 300
-              }}
+              className="cta-description"
             >
               Let's create something extraordinary. Get in touch to discuss your next project.
             </motion.p>
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              style={{ display: 'inline-block' }}
+              className="cta-button-wrapper"
             >
               <Link
                 href="/contact"
-                className="btn-outline"
-                style={{
-                  backgroundColor: '#ffffff',
-                  color: 'var(--bg-primary)',
-                  borderColor: '#ffffff',
-                  fontWeight: 700,
-                  padding: '1rem 2.5rem',
-                  fontSize: '1rem'
-                }}
+                className="btn-outline cta-talk-btn"
               >
                 Let's Talk
               </Link>
@@ -383,21 +355,6 @@ const Home = () => {
           </div>
         </div>
       </section>
-      
-      {/* Mobile custom styles for border overrides */}
-      <style>{`
-        @media (max-width: 768px) {
-          .stat-card {
-            border-right: none !important;
-            border-bottom: 1px solid var(--border) !important;
-            padding-bottom: 2rem !important;
-          }
-          .stat-card:last-child {
-            border-bottom: none !important;
-            padding-bottom: 0 !important;
-          }
-        }
-      `}</style>
     </div>
   );
 };

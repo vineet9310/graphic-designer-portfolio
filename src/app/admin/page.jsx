@@ -43,48 +43,21 @@ const AdminLogin = () => {
   };
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'var(--bg-primary)',
-        padding: '1.5rem'
-      }}
-    >
-      <div
-        className="card"
-        style={{
-          width: '100%',
-          maxWidth: '420px',
-          padding: '3rem 2.5rem',
-          backgroundColor: 'var(--bg-card)',
-          border: '1px solid var(--border)',
-          textAlign: 'center'
-        }}
-      >
+    <div className="admin-login-wrapper">
+      <div className="admin-login-card">
         {/* Logo */}
-        <div
-          style={{
-            fontFamily: 'var(--font-heading)',
-            fontSize: '2rem',
-            fontWeight: 800,
-            letterSpacing: '-0.03em',
-            marginBottom: '2rem'
-          }}
-        >
-          <span style={{ color: 'var(--accent)' }}>A</span>LEX.<span style={{ fontSize: '0.85rem', fontWeight: 400, color: 'var(--text-secondary)', marginLeft: '4px' }}>ADMIN</span>
+        <div className="admin-login-logo">
+          <span className="admin-login-logo-accent">V</span>ividForge.<span className="admin-login-logo-sub">DASH</span>
         </div>
 
-        <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', fontFamily: 'var(--font-heading)' }}>
+        <h2 className="admin-login-h2">
           Welcome Back
         </h2>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '2.5rem', fontWeight: 300 }}>
+        <p className="admin-login-p">
           Sign in to manage your portfolio and contact messages.
         </p>
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', textAlign: 'left' }}>
+        <form onSubmit={handleSubmit} className="admin-login-form">
           {/* Email */}
           <div className="form-group">
             <label htmlFor="email" className="form-label">Admin Email</label>
@@ -118,14 +91,8 @@ const AdminLogin = () => {
           {/* Login CTA */}
           <button
             type="submit"
-            className="btn-primary"
+            className="btn-primary admin-login-btn"
             disabled={loading}
-            style={{
-              width: '100%',
-              justifyContent: 'center',
-              padding: '0.9rem',
-              marginTop: '0.5rem'
-            }}
           >
             {loading ? 'Logging in...' : 'Login'}
           </button>

@@ -42,62 +42,31 @@ const Portfolio = () => {
     : activeProjects.filter(p => p.category === selectedFilter);
 
   return (
-    <div style={{ padding: '2rem 0', backgroundColor: 'var(--bg-primary)', minHeight: '80vh' }}>
+    <div className="portfolio-page">
       <div className="container">
         
         {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-          <p style={{ color: 'var(--accent)', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
+        <div className="portfolio-header">
+          <p className="portfolio-subtitle">
             Portfolio
           </p>
-          <h1 style={{ fontSize: '3rem', fontFamily: 'var(--font-heading)', marginBottom: '1rem' }}>
+          <h1 className="portfolio-title">
             Explore My Work
           </h1>
-          <p style={{ color: 'var(--text-secondary)', maxWidth: '600px', margin: '0 auto', fontSize: '1.05rem', fontWeight: 300 }}>
+          <p className="portfolio-description">
             A curated showcase of branding campaigns, digital layouts, custom illustrations, and creative visual designs.
           </p>
         </div>
 
         {/* Filter Pills */}
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            flexWrap: 'wrap',
-            gap: '0.75rem',
-            marginBottom: '3.5rem'
-          }}
-        >
+        <div className="filter-container">
           {categories.map((cat) => {
             const isActive = selectedFilter === cat;
             return (
               <button
                 key={cat}
                 onClick={() => setSelectedFilter(cat)}
-                style={{
-                  backgroundColor: isActive ? 'var(--accent)' : 'var(--bg-surface)',
-                  color: isActive ? '#ffffff' : 'var(--text-secondary)',
-                  border: `1px solid ${isActive ? 'var(--accent)' : 'var(--border)'}`,
-                  padding: '0.55rem 1.25rem',
-                  borderRadius: '20px',
-                  fontSize: '0.85rem',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  letterSpacing: '0.02em',
-                  transition: 'all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-                }}
-                onMouseEnter={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.color = '#ffffff';
-                    e.currentTarget.style.borderColor = 'var(--accent)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.color = 'var(--text-secondary)';
-                    e.currentTarget.style.borderColor = 'var(--border)';
-                  }
-                }}
+                className={`filter-btn ${isActive ? 'active' : ''}`}
               >
                 {cat}
               </button>
@@ -107,48 +76,85 @@ const Portfolio = () => {
 
         {/* Projects Grid */}
         {loading ? (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
-              gap: '2rem'
-            }}
-          >
-            {[1, 2, 3, 4, 5, 6].map((n) => (
-              <div key={n} className="card" style={{ height: '380px' }}>
-                <div className="skeleton" style={{ height: '70%' }} />
-                <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                  <div className="skeleton" style={{ height: '15px', width: '25%' }} />
-                  <div className="skeleton" style={{ height: '25px', width: '60%' }} />
+          <div className="portfolio-grid-premium">
+            {[1, 2, 3, 4, 5, 6].map((n, index) => {
+              const itemClass = index % 5 === 0 ? 'portfolio-item-wide' : index % 5 === 3 ? 'portfolio-item-tall' : 'portfolio-item-standard';
+              return (
+                <div key={n} className={`portfolio-card-premium ${itemClass}`}>
+                  <div className="skeleton skeleton-card-img-wrapper" />
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <motion.div
             layout
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
-              gap: '2rem'
-            }}
+            className="portfolio-grid-premium"
           >
             <AnimatePresence mode="popLayout">
-              {filteredProjects.map((project) => (
-                <ProjectCard
-                  key={project._id}
-                  project={project}
-                  onClick={() => setSelectedProject(project)}
-                />
-              ))}
+              {filteredProjects.map((project, index) => {
+                const itemClass = index % 5 === 0 ? 'portfolio-item-wide' : index % 5 === 3 ? 'portfolio-item-tall' : 'portfolio-item-standard';
+                return (
+                  <motion.div
+                    layout
+                    key={project._id}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.4 }}
+                    whileHover={{ y: -8 }}
+                    onClick={() => setSelectedProject(project)}
+                    className={`portfolio-card-premium ${itemClass}`}
+                  >
+                    <div className="portfolio-card-img-wrapper">
+                      <img
+                        src={project.coverImage || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80'}
+                        alt={project.title}
+                        loading="lazy"
+                        className="portfolio-card-img"
+                      />
+                      
+                      <div className="portfolio-card-overlay-drawer">
+                        <span className="portfolio-card-overlay-category">
+                          {project.category}
+                        </span>
+                        
+                        <h3 className="portfolio-card-overlay-title">
+                          {project.title}
+                        </h3>
+
+                        {project.description && (
+                          <p className="portfolio-card-overlay-desc">
+                            {project.description}
+                          </p>
+                        )}
+
+                        {project.tools && project.tools.length > 0 && (
+                          <div className="portfolio-card-tools-container">
+                            {project.tools.slice(0, 3).map((tool, idx) => (
+                              <span key={idx} className="portfolio-card-tool-tag">
+                                {tool}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
+                        <div className="portfolio-card-action-btn">
+                          View Project &rarr;
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </AnimatePresence>
           </motion.div>
         )}
 
         {/* Empty state */}
         {!loading && filteredProjects.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '5rem 0' }}>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>
+          <div className="empty-state">
+            <p className="empty-state-text">
               No projects found in this category yet.
             </p>
           </div>
@@ -156,12 +162,14 @@ const Portfolio = () => {
       </div>
 
       {/* Project Modal */}
-      {selectedProject && (
-        <ProjectModal
-          project={selectedProject}
-          onClose={() => setSelectedProject(null)}
-        />
-      )}
+      <AnimatePresence>
+        {selectedProject && (
+          <ProjectModal
+            project={selectedProject}
+            onClose={() => setSelectedProject(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

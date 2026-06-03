@@ -36,83 +36,34 @@ const Navbar = () => {
     { name: 'Portfolio', path: '/portfolio', visible: settings?.navbar?.portfolio !== false },
     { name: 'About', path: '/about', visible: settings?.navbar?.about !== false },
     { name: 'Services', path: '/services', visible: settings?.navbar?.services !== false },
+    { name: 'Blogs', path: '/blogs', visible: settings?.navbar?.blogs !== false },
     { name: 'Contact', path: '/contact', visible: settings?.navbar?.contact !== false }
   ].filter(link => link.visible);
 
   return (
     <>
-      <nav
-        style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 100,
-          background: scrolled ? 'rgba(10, 10, 10, 0.85)' : 'transparent',
-          backdropFilter: scrolled ? 'blur(10px)' : 'none',
-          borderBottom: scrolled ? '1px solid var(--border)' : '1px solid transparent',
-          padding: '0.5rem 0',
-          transition: 'all 0.3s ease'
-        }}
-      >
-        <div
-          className="container"
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}
-        >
+      <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
+        <div className="container navbar-container">
           {/* Logo */}
-          <Link
-            href="/"
-            style={{
-              fontFamily: 'var(--font-heading)',
-              fontSize: '1.5rem',
-              fontWeight: 800,
-              letterSpacing: '-0.03em',
-              color: 'var(--text-primary)'
-            }}
-          >
-            <span style={{ color: 'var(--accent)' }}>A</span>LEX.
+          <Link href="/" className="navbar-logo">
+            <span>V</span>ividForge.
           </Link>
 
           {/* Desktop Nav */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '2.5rem'
-            }}
-            className="desktop-menu"
-          >
+          <div className="desktop-menu">
             {navLinks.map((link) => {
               const isActive = link.path === '/' ? pathname === '/' : pathname.startsWith(link.path);
               return (
                 <Link
                   key={link.name}
                   href={link.path}
-                  style={{
-                    color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
-                    fontSize: '0.9rem',
-                    fontWeight: 500,
-                    letterSpacing: '0.05em',
-                    textTransform: 'uppercase',
-                    padding: '0.5rem 0',
-                    position: 'relative',
-                    transition: 'color 0.2s ease'
-                  }}
+                  className={`navbar-link ${isActive ? 'active' : ''}`}
                 >
                   {link.name}
                   {isActive && (
                     <motion.div
                       layoutId="activeUnderline"
-                      style={{
-                        position: 'absolute',
-                        bottom: 0,
-                        left: 0,
-                        width: '100%',
-                        height: '2px',
-                        backgroundColor: 'var(--accent)'
-                      }}
+                      className="navbar-active-underline"
                       transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                     />
                   )}
@@ -124,15 +75,6 @@ const Navbar = () => {
           {/* Hamburger Menu Toggle */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--text-primary)',
-              fontSize: '1.5rem',
-              cursor: 'pointer',
-              display: 'none',
-              alignItems: 'center'
-            }}
             className="mobile-menu-btn"
           >
             {isOpen ? <FaTimes /> : <FaBars />}
@@ -148,20 +90,7 @@ const Navbar = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100vh',
-              background: 'rgba(10, 10, 10, 0.98)',
-              zIndex: 99,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-              gap: '2.5rem'
-            }}
+            className="mobile-menu-overlay"
           >
             {navLinks.map((link) => {
               const isActive = link.path === '/' ? pathname === '/' : pathname.startsWith(link.path);
@@ -170,15 +99,7 @@ const Navbar = () => {
                   key={link.name}
                   href={link.path}
                   onClick={() => setIsOpen(false)}
-                  style={{
-                    color: isActive ? 'var(--accent)' : 'var(--text-primary)',
-                    fontSize: '2rem',
-                    fontWeight: 600,
-                    fontFamily: 'var(--font-heading)',
-                    letterSpacing: '0.05em',
-                    textTransform: 'uppercase',
-                    position: 'relative'
-                  }}
+                  className={`mobile-navbar-link ${isActive ? 'active' : ''}`}
                 >
                   {link.name}
                 </Link>
@@ -187,18 +108,6 @@ const Navbar = () => {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Add CSS for media query to manage desktop vs mobile menu display */}
-      <style>{`
-        @media (max-width: 768px) {
-          .desktop-menu {
-            display: none !important;
-          }
-          .mobile-menu-btn {
-            display: flex !important;
-          }
-        }
-      `}</style>
     </>
   );
 };

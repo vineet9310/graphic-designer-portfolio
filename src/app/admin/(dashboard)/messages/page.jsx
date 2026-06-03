@@ -68,38 +68,37 @@ const AdminMessages = () => {
   };
 
   return (
-    <div style={{ width: '100%' }}>
+    <div className="admin-dashboard-container">
       {/* Header */}
-      <div style={{ marginBottom: '3rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="messages-header">
         <div>
-          <h1 style={{ fontSize: '2.25rem', fontFamily: 'var(--font-heading)', marginBottom: '0.5rem' }}>
+          <h1 className="messages-h1">
             Contact Messages
           </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
+          <p className="messages-subtitle">
             View and manage submissions sent via your public contact form.
           </p>
         </div>
         <button 
           onClick={fetchMessages}
-          className="btn-outline" 
-          style={{ padding: '0.5rem 1.25rem', fontSize: '0.85rem' }}
+          className="btn-outline messages-refresh-btn"
         >
           Refresh Inbox
         </button>
       </div>
 
       {loading ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div className="messages-list">
           {[1, 2, 3].map((n) => (
-            <div key={n} className="card" style={{ height: '80px' }}>
-              <div className="skeleton" style={{ height: '100%', width: '100%' }} />
+            <div key={n} className="card admin-loading-card">
+              <div className="skeleton admin-loading-skeleton" />
             </div>
           ))}
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div className="messages-list">
           {messages.length === 0 ? (
-            <div className="card" style={{ padding: '4rem 2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
+            <div className="messages-card-empty">
               No messages received yet. Your inbox is clean!
             </div>
           ) : (
@@ -108,71 +107,39 @@ const AdminMessages = () => {
               return (
                 <div
                   key={msg._id}
-                  className="card"
+                  className={`message-item-card ${!msg.isRead ? 'unread' : ''} ${isExpanded ? 'expanded' : ''}`}
                   onClick={() => toggleExpand(msg._id, msg.isRead)}
-                  style={{
-                    cursor: 'pointer',
-                    borderLeft: !msg.isRead ? '4px solid var(--accent)' : '1px solid var(--border)',
-                    backgroundColor: isExpanded ? 'var(--bg-surface)' : 'var(--bg-card)',
-                    transition: 'all 0.2s ease',
-                    overflow: 'hidden'
-                  }}
                 >
                   {/* Header Summary Row */}
-                  <div
-                    style={{
-                      padding: '1.25rem 1.5rem',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      flexWrap: 'wrap',
-                      gap: '1rem'
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                      {/* Red Dot/Envelope Indicator */}
+                  <div className="message-item-summary-row">
+                    <div className="message-item-sender-box">
+                      {/* Red Dot Indicator */}
                       {!msg.isRead ? (
-                        <span
-                          style={{
-                            width: '8px',
-                            height: '8px',
-                            borderRadius: '50%',
-                            backgroundColor: 'var(--accent)',
-                            display: 'inline-block',
-                            boxShadow: '0 0 8px var(--accent)'
-                          }}
-                          title="Unread message"
-                        />
+                        <span className="message-item-unread-dot" title="Unread message" />
                       ) : (
-                        <span style={{ width: '8px', display: 'inline-block' }} />
+                        <span className="message-item-unread-dot-placeholder" />
                       )}
                       
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontWeight: !msg.isRead ? 700 : 500, fontSize: '0.95rem' }}>
+                      <div className="message-item-sender-info">
+                        <span className={`message-item-name ${!msg.isRead ? 'unread' : ''}`}>
                           {msg.name}
                         </span>
-                        <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                        <span className="message-item-email">
                           {msg.email}
                         </span>
                       </div>
                     </div>
 
                     {/* Subject */}
-                    <div style={{ flexGrow: 1, minWidth: '150px', padding: '0 1rem' }}>
-                      <span
-                        style={{
-                          fontSize: '0.85rem',
-                          fontWeight: !msg.isRead ? 600 : 400,
-                          color: !msg.isRead ? 'var(--accent)' : 'var(--text-secondary)'
-                        }}
-                      >
+                    <div className="message-item-subject-box">
+                      <span className={`message-item-subject ${!msg.isRead ? 'unread' : ''}`}>
                         {msg.subject || 'General Inquiry'}
                       </span>
                     </div>
 
                     {/* Date & Actions */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                      <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                    <div className="message-item-meta-box">
+                      <span className="message-item-date">
                         {new Date(msg.createdAt).toLocaleDateString('en-US', {
                           month: 'short',
                           day: 'numeric',
@@ -184,18 +151,8 @@ const AdminMessages = () => {
                       {!msg.isRead && (
                         <button
                           onClick={(e) => handleMarkAsRead(msg._id, e)}
-                          style={{
-                            background: 'none',
-                            border: 'none',
-                            color: 'var(--text-secondary)',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            fontSize: '1rem'
-                          }}
+                          className="message-item-mark-read-btn"
                           title="Mark as Read"
-                          onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent)')}
-                          onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
                         >
                           <FaCheckCircle />
                         </button>
@@ -205,39 +162,18 @@ const AdminMessages = () => {
 
                   {/* Expanded Detail Panel */}
                   {isExpanded && (
-                    <div
-                      style={{
-                        padding: '1.5rem',
-                        backgroundColor: '#0c0c0c',
-                        borderTop: '1px solid var(--border)',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '1rem'
-                      }}
-                    >
-                      <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'flex', gap: '2rem' }}>
+                    <div className="message-detail-panel">
+                      <div className="message-detail-header">
                         <span><strong>From:</strong> {msg.name} ({msg.email})</span>
                         <span><strong>Subject:</strong> {msg.subject || 'General Inquiry'}</span>
                       </div>
-                      <div
-                        style={{
-                          color: 'var(--text-primary)',
-                          fontSize: '0.95rem',
-                          lineHeight: 1.6,
-                          whiteSpace: 'pre-wrap',
-                          padding: '1.25rem',
-                          backgroundColor: 'var(--bg-surface)',
-                          borderLeft: '3px solid var(--accent)',
-                          borderRadius: '0 4px 4px 0'
-                        }}
-                      >
+                      <div className="message-detail-content-box">
                         {msg.message}
                       </div>
-                      <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+                      <div className="message-detail-actions">
                         <a
                           href={`mailto:${msg.email}?subject=RE: ${encodeURIComponent(msg.subject || 'Portfolio Inquiry')}`}
-                          className="btn-primary"
-                          style={{ padding: '0.5rem 1.25rem', fontSize: '0.8rem' }}
+                          className="btn-primary message-detail-reply-btn"
                         >
                           Reply via Email
                         </a>

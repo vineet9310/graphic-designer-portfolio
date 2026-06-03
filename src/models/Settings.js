@@ -14,7 +14,7 @@ const settingsSchema = new mongoose.Schema({
     description: { type: String, default: 'Crafting premium visual identities, digital products, and high-impact designs for bold brands worldwide.' }
   },
   about: {
-    bioParagraph1: { type: String, default: "Hello! I'm Alex, a creative director and multidisciplinary designer based in New York. With over 5 years of professional design experience, I specialize in transforming conceptual projects into highly engaging, modern visual assets." },
+    bioParagraph1: { type: String, default: "Hello! I'm the lead designer behind VividForge, a creative agency and multidisciplinary design studio. With over 5 years of professional design experience, we specialize in transforming conceptual projects into highly engaging, modern visual assets." },
     bioParagraph2: { type: String, default: "My philosophy revolves around minimalism, high contrast, and grid-based composition. I believe a brand identity should not just represent a company, but command attention and make viewers stop scrolling. Whether it's a sleek logo, an intricate SaaS dashboard, or vector posters, I approach every project with raw artistic intent and absolute precision." },
     resumeUrl: { type: String, default: '' },
     portraitImage: { type: String, default: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80' }
@@ -73,6 +73,7 @@ const settingsSchema = new mongoose.Schema({
     portfolio: { type: Boolean, default: true },
     about: { type: Boolean, default: true },
     services: { type: Boolean, default: true },
+    blogs: { type: Boolean, default: true },
     contact: { type: Boolean, default: true }
   }
 });

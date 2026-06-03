@@ -3,9 +3,9 @@ import Footer from '@/components/Footer';
 
 export default function PublicLayout({ children }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <div className="layout-wrapper">
       <Navbar />
-      <main style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+      <main className="layout-main">
         {children}
       </main>
       <Footer />

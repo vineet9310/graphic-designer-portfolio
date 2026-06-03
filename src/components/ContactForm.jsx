@@ -56,7 +56,7 @@ const ContactForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+    <form onSubmit={handleSubmit} className="contact-form">
       
       {/* Name */}
       <div className="form-group">
@@ -100,7 +100,6 @@ const ContactForm = () => {
           onChange={handleChange}
           className="form-select"
           disabled={loading}
-          style={{ width: '100%' }}
         >
           <option value="General Inquiry">General Inquiry</option>
           <option value="Logo Design">Logo Design</option>
@@ -130,14 +129,8 @@ const ContactForm = () => {
       {/* Submit Button */}
       <button
         type="submit"
-        className="btn-primary"
+        className="btn-primary contact-submit-btn"
         disabled={loading}
-        style={{
-          width: '100%',
-          justifyContent: 'center',
-          padding: '1rem',
-          marginTop: '0.5rem'
-        }}
       >
         {loading ? 'Sending...' : 'Send Message'}
       </button>

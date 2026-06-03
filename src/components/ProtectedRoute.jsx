@@ -1,17 +1,29 @@
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 
 const ProtectedRoute = ({ children }) => {
   const { isAdmin, loading } = useAuth();
   const router = useRouter();
+  const prevIsAdmin = useRef(isAdmin);
 
   useEffect(() => {
     if (!loading && !isAdmin) {
-      router.push('/admin');
+      const justLoggedOut = typeof window !== 'undefined' && sessionStorage.getItem('justLoggedOut') === 'true';
+      if (justLoggedOut) {
+        if (typeof window !== 'undefined') {
+          sessionStorage.removeItem('justLoggedOut');
+        }
+        router.push('/');
+      } else if (prevIsAdmin.current === true) {
+        router.push('/');
+      } else {
+        router.push('/admin');
+      }
     }
+    prevIsAdmin.current = isAdmin;
   }, [isAdmin, loading, router]);
 
   if (loading) {
