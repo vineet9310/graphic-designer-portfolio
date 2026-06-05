@@ -7,6 +7,11 @@ export const metadata = {
   description: 'Premium visual identities, digital products, and high-impact designs for bold brands.',
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+};
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
