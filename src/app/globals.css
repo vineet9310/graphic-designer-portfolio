@@ -4193,6 +4193,17 @@ button, input, select, textarea {
   left: 25px;
 }
 
+/* Hide Next.js Dev/Pre-render indicators in the browser */
+nextjs-portal, 
+#nextjs-portal,
+#__next-build-watcher, 
+.nextjs-static-indicator {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
 
 
 

@@ -60,7 +60,10 @@ const api = async (endpoint, options = {}) => {
 
     return json;
   } catch (error) {
-    console.error(`API Fetch Error [${options.method || 'GET'} ${endpoint}]:`, error.message);
+    // Only log server errors (5xx) or unexpected network/runtime failures
+    if (!error.status || error.status >= 500) {
+      console.error(`API Fetch Error [${options.method || 'GET'} ${endpoint}]:`, error.message);
+    }
     throw error;
   }
 };
