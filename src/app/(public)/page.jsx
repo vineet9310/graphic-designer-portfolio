@@ -1,17 +1,19 @@
 "use client";
 
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useProjects } from '@/hooks/useProjects';
 import { useSettings } from '@/hooks/useSettings';
 import ProjectCard from '@/components/ProjectCard';
+import ProjectModal from '@/components/ProjectModal';
 import { useBlogs } from '@/hooks/useBlogs';
 
 const Home = () => {
   const { featuredProjects, loading: projectsLoading, fetchFeaturedProjects } = useProjects();
   const { settings, loading: settingsLoading } = useSettings();
   const { blogs, fetchBlogs } = useBlogs();
+  const [selectedProject, setSelectedProject] = useState(null);
 
   useEffect(() => {
     fetchFeaturedProjects();
@@ -185,13 +187,13 @@ const Home = () => {
                     { _id: 'm2', title: 'Zenith UI/UX Platform', category: 'UI/UX', coverImage: 'https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=800&auto=format&fit=crop&q=80', description: 'SaaS product design and dashboard layouts.' },
                     { _id: 'm3', title: 'Chronos Poster Series', category: 'Print', coverImage: 'https://images.unsplash.com/photo-1561070791-26c113006238?w=800&auto=format&fit=crop&q=80', description: 'Minimal poster set exploring spacetime.' }
                   ].map((proj) => (
-                    <ProjectCard key={proj._id} project={proj} />
+                    <ProjectCard key={proj._id} project={proj} onClick={() => setSelectedProject(proj)} />
                   ))}
                 </div>
               ) : (
                 <div className="projects-grid">
                   {featuredProjects.slice(0, 3).map((project) => (
-                    <ProjectCard key={project._id} project={project} />
+                    <ProjectCard key={project._id} project={project} onClick={() => setSelectedProject(project)} />
                   ))}
                 </div>
               )}
@@ -355,6 +357,16 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {/* Project Modal spotlight overlay */}
+      <AnimatePresence>
+        {selectedProject && (
+          <ProjectModal
+            project={selectedProject}
+            onClose={() => setSelectedProject(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };
