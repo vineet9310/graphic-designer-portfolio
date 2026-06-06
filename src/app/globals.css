@@ -794,32 +794,46 @@ button, input, select, textarea {
   top: 0;
   left: 0;
   width: 100%;
-  height: 100vh;
-  background: rgba(10, 10, 10, 0.98);
+  height: auto;
+  background: rgba(10, 10, 10, 0.96);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
   z-index: 99;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 2.5rem;
+  justify-content: flex-start;
+  align-items: stretch;
+  gap: 0;
+  padding: 5rem 1.5rem 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
 }
 
 .mobile-navbar-link {
   color: var(--text-primary);
-  font-size: 2rem;
-  font-weight: 600;
+  font-size: 0.85rem;
+  font-weight: 500;
   font-family: var(--font-heading);
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   position: relative;
+  padding: 0.65rem 0.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.3s ease;
 }
 
-.mobile-navbar-link:hover {
-  color: var(--accent);
+.mobile-navbar-link:last-child {
+  border-bottom: none;
 }
 
+.mobile-navbar-link:hover,
 .mobile-navbar-link.active {
   color: var(--accent);
+  padding-left: 0.5rem;
+  background: rgba(255, 255, 255, 0.02);
 }
 
 @media (max-width: 768px) {
@@ -4888,6 +4902,181 @@ nextjs-portal,
 @media (max-width: 380px) {
   .about-tools-grid {
     grid-template-columns: 1fr !important;
+  }
+}
+
+/* 4. Portfolio Page & Project Modal Mobile Specific Styles (768px and below) */
+@media (max-width: 768px) {
+  .portfolio-header {
+    text-align: left !important;
+    margin-bottom: 2rem !important;
+  }
+
+  .portfolio-title {
+    font-size: 1.85rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .portfolio-subtitle {
+    font-size: 0.75rem !important;
+    letter-spacing: 0.12em !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  .portfolio-description {
+    font-size: 0.85rem !important;
+    line-height: 1.5 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    text-align: left !important;
+  }
+
+  .filter-btn {
+    padding: 0.4rem 0.9rem !important;
+    font-size: 0.75rem !important;
+    border-radius: 15px !important;
+  }
+
+  /* Portfolio Grid 2-columns on mobile for premium catalog look */
+  .portfolio-grid-premium {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem !important;
+    margin-bottom: 3rem !important;
+  }
+
+  .portfolio-item-wide {
+    grid-column: span 2 !important;
+    grid-row: auto !important;
+  }
+
+  .portfolio-item-tall, 
+  .portfolio-item-standard {
+    grid-column: span 1 !important;
+    grid-row: auto !important;
+  }
+
+  /* Alternate heights for cards on mobile to create staggered asymmetric effect */
+  .portfolio-item-wide .portfolio-card-premium {
+    min-height: 100px !important;
+    height: 100px !important;
+    border-radius: 6px !important;
+  }
+
+  .portfolio-item-tall .portfolio-card-premium {
+    min-height: 140px !important;
+    height: 140px !important;
+    border-radius: 6px !important;
+  }
+
+  .portfolio-item-standard .portfolio-card-premium {
+    min-height: 100px !important;
+    height: 100px !important;
+    border-radius: 6px !important;
+  }
+
+  /* Compact details always visible at the bottom of the card on mobile */
+  .portfolio-card-overlay-drawer {
+    position: absolute !important;
+    inset: auto 0 0 0 !important;
+    background: linear-gradient(to top, rgba(10, 10, 10, 0.95) 0%, rgba(10, 10, 10, 0.6) 80%, rgba(10, 10, 10, 0) 100%) !important;
+    padding: 0.75rem 0.4rem 0.25rem 0.4rem !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+  }
+
+  .portfolio-card-overlay-category {
+    font-size: 0.52rem !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.1em !important;
+    margin-bottom: 0.1rem !important;
+  }
+
+  .portfolio-card-overlay-title {
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+    margin-bottom: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  /* Hide description, tools, view button inside the card on mobile to keep layout clean */
+  .portfolio-card-overlay-desc,
+  .portfolio-card-tools-container,
+  .portfolio-card-action-btn {
+    display: none !important;
+    opacity: 0 !important;
+  }
+
+  /* Compact Project Modal text sizes on mobile */
+  .modal-category-badge {
+    font-size: 0.7rem !important;
+    padding: 0.2rem 0.6rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .modal-title {
+    font-size: 1.65rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .modal-description {
+    font-size: 0.85rem !important;
+    line-height: 1.55 !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .modal-tools-wrapper {
+    margin-top: 1rem !important;
+    padding-top: 1rem !important;
+  }
+
+  .modal-tools-header {
+    font-size: 0.75rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .modal-tool-tag {
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.7rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .portfolio-item-wide .portfolio-card-premium {
+    min-height: 85px !important;
+    height: 85px !important;
+  }
+
+  .portfolio-item-tall .portfolio-card-premium {
+    min-height: 120px !important;
+    height: 120px !important;
+  }
+
+  .portfolio-item-standard .portfolio-card-premium {
+    min-height: 85px !important;
+    height: 85px !important;
+  }
+
+  .portfolio-card-overlay-title {
+    font-size: 0.7rem !important;
+  }
+
+  .portfolio-card-overlay-category {
+    font-size: 0.5rem !important;
+  }
+
+  .filter-btn {
+    padding: 0.35rem 0.75rem !important;
+    font-size: 0.7rem !important;
+  }
+
+  .modal-title {
+    font-size: 1.4rem !important;
+  }
+
+  .modal-description {
+    font-size: 0.8rem !important;
   }
 }
 
