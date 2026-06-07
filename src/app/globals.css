@@ -1611,7 +1611,8 @@ button, input, select, textarea {
 
 @media (max-width: 850px) {
   .about-split {
-    grid-template-columns: 1fr !important;
+    display: flex !important;
+    flex-direction: column-reverse !important;
     gap: 3rem !important;
   }
   .about-split-skills-timeline {
@@ -2344,11 +2345,7 @@ button, input, select, textarea {
   }
 }
 
-@media (max-width: 640px) {
-  .journal-editorial-grid {
-    grid-template-columns: 1fr;
-  }
-}
+
 
 .blogs-subtitle {
   color: var(--accent);
@@ -3159,43 +3156,43 @@ button, input, select, textarea {
   font-weight: 600;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  font-size: 0.9rem;
+  font-size: 0.8rem; /* Scaled down from 0.9rem */
   margin-bottom: 0.5rem;
 }
 
 .contact-info-title {
-  font-size: 3rem;
+  font-size: 2.4rem; /* Scaled down from 3rem */
   font-family: var(--font-heading);
-  margin-bottom: 1.5rem;
-  line-height: 1.1;
+  margin-bottom: 1.25rem;
+  line-height: 1.15;
 }
 
 .contact-info-description {
   color: var(--text-secondary);
-  font-size: 1.05rem;
-  margin-bottom: 3rem;
+  font-size: 0.92rem; /* Scaled down from 1.05rem */
+  margin-bottom: 2.5rem;
   font-weight: 300;
-  line-height: 1.7;
+  line-height: 1.6;
 }
 
 .contact-details-list {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  margin-bottom: 3rem;
+  gap: 1.5rem; /* Scaled down from 2rem */
+  margin-bottom: 2.5rem;
 }
 
 .contact-detail-item {
   display: flex;
-  gap: 1rem;
+  gap: 0.85rem;
   align-items: center;
 }
 
 .contact-detail-icon-box {
   color: var(--accent);
-  font-size: 1.25rem;
-  width: 45px;
-  height: 45px;
+  font-size: 1.15rem; /* Scaled down from 1.25rem */
+  width: 40px; /* Scaled down from 45px */
+  height: 40px;
   background-color: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -3205,15 +3202,15 @@ button, input, select, textarea {
 }
 
 .contact-detail-label {
-  font-size: 0.8rem;
+  font-size: 0.72rem; /* Scaled down from 0.8rem */
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 0.15rem;
+  margin-bottom: 0.1rem;
 }
 
 .contact-detail-link {
-  font-size: 1rem;
+  font-size: 0.9rem; /* Scaled down from 1rem */
   font-weight: 600;
   color: var(--text-primary);
   transition: color 0.2s ease;
@@ -3224,28 +3221,28 @@ button, input, select, textarea {
 }
 
 .contact-social-heading {
-  font-size: 0.8rem;
+  font-size: 0.72rem; /* Scaled down from 0.8rem */
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 1rem;
+  margin-bottom: 0.85rem;
 }
 
 .contact-social-container {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem; /* Scaled down from 1rem */
 }
 
 .contact-social-btn {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
   background-color: var(--bg-surface);
   border: 1px solid var(--border);
   color: var(--text-primary);
-  padding: 0.6rem 1.25rem;
+  padding: 0.5rem 1.15rem; /* Scaled down from 0.6rem 1.25rem */
   border-radius: 4px;
-  font-size: 0.85rem;
+  font-size: 0.78rem; /* Scaled down from 0.85rem */
   font-weight: 600;
   transition: all 0.2s ease;
 }
@@ -3256,17 +3253,45 @@ button, input, select, textarea {
 }
 
 .contact-form-container-card {
-  padding: 3rem 2.5rem;
+  padding: 1.75rem 1.5rem;
   background-color: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 4px;
-  overflow: visible; /* Prevents button & messages cut-off at bottom */
+  max-width: 440px !important;
+  width: 100%;
+  overflow: visible;
 }
 
 .contact-form-title {
-  font-size: 1.75rem;
+  font-size: 1.25rem;
   font-family: var(--font-heading);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.contact-form .form-group {
+  margin-bottom: 0.85rem !important;
+  gap: 0.3rem !important;
+}
+
+.contact-form .form-label {
+  font-size: 0.7rem !important;
+  margin-bottom: 0.2rem !important;
+}
+
+.contact-form .form-input,
+.contact-form .form-select,
+.contact-form .form-textarea {
+  font-size: 0.8rem !important;
+  padding: 0.55rem 0.75rem !important;
+}
+
+.contact-form .form-textarea {
+  min-height: 80px !important;
+}
+
+.contact-form .contact-submit-btn {
+  padding: 0.6rem 1.5rem !important;
+  font-size: 0.8rem !important;
 }
 
 .contact-loading-container {
@@ -3289,6 +3314,18 @@ button, input, select, textarea {
     grid-template-columns: 1fr;
     gap: 4rem;
   }
+  .contact-desktop-badge-wrapper {
+    display: none !important;
+  }
+  .contact-mobile-badge-wrapper {
+    display: flex !important;
+    justify-content: center !important;
+    margin-top: 2.5rem !important;
+    width: 100% !important;
+  }
+  .contact-mobile-badge-wrapper .pulsing-badge-container {
+    margin-bottom: 0 !important;
+  }
 }
 
 /* Pulsing Availability Indicator Badge */
@@ -3301,6 +3338,19 @@ button, input, select, textarea {
   padding: 0.4rem 0.85rem;
   border-radius: 50px;
   margin-bottom: 1.5rem;
+}
+
+.contact-desktop-badge-wrapper {
+  display: block;
+  margin-top: 2.25rem;
+}
+
+.contact-desktop-badge-wrapper .pulsing-badge-container {
+  margin-bottom: 0 !important;
+}
+
+.contact-mobile-badge-wrapper {
+  display: none !important;
 }
 
 .pulsing-dot {
@@ -4256,7 +4306,7 @@ nextjs-portal,
   .portfolio-page,
   .blogs-page,
   .contact-section {
-    padding: 3.5rem 0 !important;
+    padding: 1.5rem 0 !important;
   }
 
   /* Hero Section Mobile Polishing */
@@ -4307,16 +4357,179 @@ nextjs-portal,
     font-size: 0.68rem !important;
   }
 
-  /* Services Grid Tweaks */
+  /* Services Page Mobile & Tablet Optimizations */
+  .services-page .card {
+    height: auto !important;
+  }
+
+  .services-header {
+    margin-bottom: 2rem !important;
+  }
+
   .services-grid {
-    gap: 1.5rem !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory !important;
+    gap: 1rem !important;
+    padding-bottom: 1.5rem !important;
     margin-bottom: 4rem !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: thin !important;
+  }
+
+  .services-grid::-webkit-scrollbar {
+    display: none !important;
   }
 
   .service-card {
-    padding: 2rem 1.5rem !important;
-    min-height: auto !important;
+    flex: 0 0 280px !important;
+    scroll-snap-align: start !important;
+    padding: 1.75rem 1.25rem !important;
     gap: 1rem !important;
+    height: auto !important;
+    min-height: auto !important;
+    border: 1px solid var(--border) !important;
+    background: linear-gradient(135deg, var(--bg-card) 0%, rgba(255, 255, 255, 0.01) 100%) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease !important;
+  }
+
+  .service-card:active {
+    transform: scale(0.98) !important;
+    border-color: rgba(230, 57, 70, 0.3) !important;
+    box-shadow: 0 4px 15px rgba(230, 57, 70, 0.1) !important;
+  }
+
+  .service-icon-box {
+    width: 50px !important;
+    height: 50px !important;
+    font-size: 1.5rem !important;
+    border-radius: 6px !important;
+    filter: drop-shadow(0 0 3px rgba(230, 57, 70, 0.3)) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .service-card-title {
+    font-size: 1.15rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .service-card-desc {
+    font-size: 0.85rem !important;
+    line-height: 1.5 !important;
+  }
+
+  .service-includes-wrapper {
+    padding-top: 1rem !important;
+    margin-top: 0.5rem !important;
+  }
+
+  .service-includes-header {
+    font-size: 0.72rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .service-includes-list {
+    gap: 0.4rem !important;
+  }
+
+  .service-includes-item {
+    font-size: 0.75rem !important;
+    gap: 0.4rem !important;
+  }
+
+  /* Pricing / Packages Mobile & Tablet Optimizations */
+  .pricing-header {
+    margin-bottom: 2.5rem !important;
+  }
+
+  .pricing-title {
+    font-size: 1.75rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  .pricing-description {
+    font-size: 0.9rem !important;
+    line-height: 1.5 !important;
+  }
+
+  .pricing-grid {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory !important;
+    gap: 1.5rem !important;
+    padding-bottom: 2rem !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: thin !important;
+  }
+
+  .pricing-grid::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .package-card {
+    flex: 0 0 290px !important;
+    scroll-snap-align: start !important;
+    margin: 1.25rem 0 !important;
+    padding: 2.25rem 1.5rem !important;
+    gap: 1.5rem !important;
+    height: auto !important;
+    min-height: auto !important;
+    background: linear-gradient(135deg, var(--bg-card) 0%, rgba(255, 255, 255, 0.01) 100%) !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25) !important;
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease !important;
+  }
+
+  .package-card:active {
+    transform: scale(0.98) !important;
+  }
+
+  .package-card.featured {
+    border: 1px solid var(--accent) !important;
+    border-top: 3px solid var(--accent) !important; /* Highlighting border effect */
+    box-shadow: 0 10px 25px rgba(230, 57, 70, 0.15), 0 4px 15px rgba(0, 0, 0, 0.25) !important;
+  }
+
+  .package-badge {
+    padding: 0.2rem 0.8rem !important;
+    font-size: 0.68rem !important;
+  }
+
+  .package-title {
+    font-size: 1.25rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  .package-price {
+    font-size: 2.25rem !important;
+    margin: 0.35rem 0 !important;
+  }
+
+  .package-description {
+    font-size: 0.8rem !important;
+    min-height: auto !important;
+    line-height: 1.4 !important;
+  }
+
+  .package-features-list {
+    padding-top: 1.25rem !important;
+    gap: 0.75rem !important;
+  }
+
+  .package-features-item {
+    font-size: 0.82rem !important;
+    gap: 0.6rem !important;
+  }
+
+  .package-action {
+    padding-top: 1rem !important;
   }
 
   /* Infinite Marquee Scale */
@@ -4447,27 +4660,242 @@ nextjs-portal,
   }
 
   /* About Page Responsive Layout Adjustments */
+  .about-split {
+    gap: 2.25rem !important;
+    margin-bottom: 3.5rem !important;
+  }
+
+  .about-portrait-wrapper {
+    max-width: 280px !important;
+    margin: 0 auto !important;
+  }
+
   .about-portrait-frame {
     inset: 10px 0px -10px 10px !important; /* Fixed negative right offset causing screen overflow bleed */
   }
 
   .about-split-skills-timeline {
-    padding-top: 3.5rem !important;
-    gap: 3.5rem !important;
+    padding-top: 3rem !important;
+    gap: 3rem !important;
   }
 
   .about-section-heading {
-    font-size: 1.65rem !important;
+    font-size: 1.45rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .about-subtitle {
+    font-size: 0.8rem !important;
+    margin-bottom: 0.4rem !important;
+  }
+
+  .about-title {
+    font-size: 1.75rem !important;
+    margin-bottom: 0.85rem !important;
+  }
+
+  .about-bio-p1 {
+    font-size: 0.95rem !important;
+    line-height: 1.55 !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .about-bio-p2 {
+    font-size: 0.88rem !important;
+    line-height: 1.55 !important;
     margin-bottom: 1.75rem !important;
   }
 
-  /* Contact Page Details spacing */
+  .about-page .btn-primary {
+    padding: 0.7rem 1.5rem !important;
+    font-size: 0.85rem !important;
+  }
+
+  .about-skill-name {
+    font-size: 0.85rem !important;
+  }
+
+  .about-skill-percent {
+    font-size: 0.8rem !important;
+  }
+
+  .about-skills-wrapper {
+    gap: 1.15rem !important;
+    margin-bottom: 2.5rem !important;
+  }
+
+  .about-tools-heading {
+    font-size: 1.05rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  /* Alternating 3-in-line layout (2 small, 1 big / 1 big, 2 small) */
+  .about-tool-card {
+    grid-column: span 1 !important;
+    position: relative !important;
+    overflow: hidden !important;
+    transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease !important;
+  }
+  
+  .about-tool-card:active {
+    transform: scale(0.96) !important;
+    background-color: var(--bg-surface) !important;
+  }
+  
+  /* 3rd and 4th items of every 6 items span 2 columns (BIG CARDS WITH GLOW & RED BORDER HIGHLIGHT EFFECTS) */
+  .about-tool-card:nth-child(6n+3),
+  .about-tool-card:nth-child(6n+4) {
+    grid-column: span 2 !important;
+    flex-direction: row !important;
+    justify-content: flex-start !important;
+    padding: 0.8rem 1.15rem !important;
+    gap: 0.75rem !important;
+    background: linear-gradient(135deg, rgba(230, 57, 70, 0.08) 0%, var(--bg-card) 100%) !important;
+    border: 1px solid rgba(230, 57, 70, 0.3) !important;
+    border-left: 3px solid var(--accent) !important;
+    box-shadow: 0 4px 15px rgba(230, 57, 70, 0.15), inset 0 0 10px rgba(230, 57, 70, 0.03) !important;
+  }
+
+  .about-tool-card:nth-child(6n+3) .about-tool-icon,
+  .about-tool-card:nth-child(6n+4) .about-tool-icon {
+    font-size: 1.45rem !important;
+    filter: drop-shadow(0 0 5px rgba(230, 57, 70, 0.6)) !important;
+    transform: scale(1.1) !important;
+  }
+
+  .about-tool-card:nth-child(6n+3) span:not(.about-tool-icon),
+  .about-tool-card:nth-child(6n+4) span:not(.about-tool-icon) {
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.02em !important;
+    color: #ffffff !important;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.1) !important;
+  }
+
+  /* 1st, 2nd, 5th, and 6th items are small (SMALL CARDS WITH SLEEK GLASSY SHADOW EFFECTS) */
+  .about-tool-card:nth-child(6n+1),
+  .about-tool-card:nth-child(6n+2),
+  .about-tool-card:nth-child(6n+5),
+  .about-tool-card:nth-child(6n+6) {
+    flex-direction: column !important;
+    justify-content: center !important;
+    padding: 0.7rem 0.4rem !important;
+    font-size: 0.72rem !important;
+    gap: 0.35rem !important;
+    background: linear-gradient(135deg, var(--bg-card) 0%, rgba(255, 255, 255, 0.01) 100%) !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25) !important;
+  }
+
+  .about-tool-card:nth-child(6n+1) .about-tool-icon,
+  .about-tool-card:nth-child(6n+2) .about-tool-icon,
+  .about-tool-card:nth-child(6n+5) .about-tool-icon,
+  .about-tool-card:nth-child(6n+6) .about-tool-icon {
+    font-size: 1.15rem !important;
+    filter: drop-shadow(0 0 3px rgba(230, 57, 70, 0.35)) !important;
+  }
+
+  .about-timeline {
+    padding-left: 1.25rem !important;
+  }
+
+  .about-timeline-line {
+    left: 3px !important;
+  }
+
+  .about-timeline-list {
+    gap: 2rem !important;
+  }
+
+  .about-timeline-item {
+    padding-left: 0.25rem !important;
+  }
+
+  .about-timeline-bullet {
+    left: calc(-1.25rem - 3.5px) !important;
+    width: 8px !important;
+    height: 8px !important;
+  }
+
+  .about-timeline-year {
+    font-size: 0.72rem !important;
+    margin-bottom: 0.15rem !important;
+  }
+
+  .about-timeline-role {
+    font-size: 1.05rem !important;
+    margin-bottom: 0.15rem !important;
+  }
+
+  .about-timeline-company {
+    font-size: 0.82rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .about-timeline-desc {
+    font-size: 0.82rem !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Contact Page Details spacing & Mobile Optimizations */
   .contact-form-container-card {
-    padding: 2rem 1.5rem !important;
+    padding: 1.25rem 1.15rem !important;
+    max-width: 420px !important;
+    margin: 0 auto !important;
   }
 
   .contact-details-list {
     gap: 1.25rem !important;
+  }
+
+  .contact-info-title {
+    font-size: 1.85rem !important;
+  }
+
+  .contact-info-description {
+    font-size: 0.88rem !important;
+    line-height: 1.5 !important;
+    margin-bottom: 2rem !important;
+  }
+
+  .contact-detail-link {
+    font-size: 0.82rem !important;
+  }
+
+  .contact-detail-icon-box {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 1rem !important;
+  }
+
+  .contact-form-title {
+    font-size: 1.15rem !important;
+    margin-bottom: 0.85rem !important;
+  }
+
+  .contact-form .form-group {
+    margin-bottom: 0.75rem !important;
+    gap: 0.25rem !important;
+  }
+
+  .contact-form .form-label {
+    font-size: 0.68rem !important;
+  }
+
+  .contact-form .form-input,
+  .contact-form .form-select,
+  .contact-form .form-textarea {
+    font-size: 0.78rem !important;
+    padding: 0.5rem 0.7rem !important;
+  }
+
+  .contact-form .form-textarea {
+    min-height: 80px !important;
+  }
+
+  .contact-form .contact-submit-btn {
+    padding: 0.55rem 1.25rem !important;
+    font-size: 0.78rem !important;
   }
 
   /* Project Image Gallery Modal Responsiveness */
@@ -4524,67 +4952,320 @@ nextjs-portal,
     flex-shrink: 0 !important;
   }
 
-  /* Blogs Page Featured Card Mobile Scaling */
+  /* Blogs Page Featured Card Mobile Scaling & Effects */
   .editorial-featured-card {
     min-height: auto !important;
+    border-left: 3px solid var(--accent) !important;
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease !important;
+  }
+
+  .editorial-featured-card:active {
+    transform: scale(0.99) !important;
   }
 
   .editorial-featured-img-box {
-    min-height: 200px !important;
-    height: 200px !important;
+    min-height: 180px !important;
+    height: 180px !important;
   }
 
   .editorial-featured-content {
     padding: 1.25rem !important;
-    gap: 0.75rem !important;
+    gap: 0.6rem !important;
   }
 
   .editorial-featured-title {
-    font-size: 1.35rem !important;
+    font-size: 1.25rem !important;
     margin-bottom: 0.25rem !important;
+    color: #ffffff !important;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.05) !important;
   }
 
   .editorial-featured-excerpt {
     font-size: 0.85rem !important;
     line-height: 1.45 !important;
     display: -webkit-box !important;
-    -webkit-line-clamp: 3 !important;
+    -webkit-line-clamp: 2 !important;
     -webkit-box-orient: vertical !important;
     overflow: hidden !important;
   }
 
   .editorial-featured-footer {
+    padding-top: 0.85rem !important;
+    margin-top: 0.4rem !important;
+  }
+
+  .editorial-featured-readmore {
+    font-size: 0.78rem !important;
+  }
+
+  /* Journal Blog Grid Card Scaling & Crazy Visual Effects */
+  .journal-editorial-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.85rem !important;
     padding-top: 1rem !important;
-    margin-top: 0.5rem !important;
+  }
+
+  .journal-editorial-grid .blog-card {
+    border-radius: 8px !important;
+    border: 1px solid var(--border) !important;
+    background: linear-gradient(135deg, var(--bg-card) 0%, rgba(230, 57, 70, 0.02) 100%) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    position: relative !important;
+    overflow: visible !important; /* Allow custom overlapping decorations */
+  }
+
+  /* Watermarked outline numbering watermark inside grid cards */
+  .journal-editorial-grid .blog-card::before {
+    position: absolute !important;
+    bottom: -15px !important;
+    right: 5px !important;
+    font-family: var(--font-heading) !important;
+    font-weight: 900 !important;
+    z-index: 0 !important;
+    pointer-events: none !important;
+    -webkit-text-stroke: 1px rgba(230, 57, 70, 0.18) !important;
+    color: transparent !important;
+    line-height: 1 !important;
+  }
+
+  /* 2nd blog overall (1st child in grid) - Crazy Small Tilted Card */
+  .journal-editorial-grid .blog-card:nth-child(1) {
+    grid-column: span 1 !important;
+    transform: rotate(-3deg) translateY(5px) !important;
+    border: 1px dashed var(--accent) !important; /* Cyberpunk dashed border style */
+    box-shadow: 0 8px 20px rgba(230, 57, 70, 0.15) !important;
+  }
+
+  .journal-editorial-grid .blog-card:nth-child(1)::before {
+    content: "02" !important;
+    font-size: 4.5rem !important;
+  }
+
+  .journal-editorial-grid .blog-card:nth-child(1):active {
+    transform: rotate(0deg) scale(1.03) !important;
+    border-style: solid !important;
+    box-shadow: 0 10px 25px rgba(230, 57, 70, 0.3) !important;
+    z-index: 10 !important;
+  }
+
+  .journal-editorial-grid .blog-card:nth-child(1) .blog-card-img-box {
+    height: 90px !important;
+    border-radius: 6px 6px 0 0 !important;
+  }
+
+  .journal-editorial-grid .blog-card:nth-child(1) .blog-card-content {
+    padding: 0.65rem !important;
+    gap: 0.25rem !important;
+    z-index: 1 !important;
+  }
+
+  .journal-editorial-grid .blog-card:nth-child(1) .blog-card-title {
+    font-size: 0.65rem !important;
+    line-height: 1.25 !important;
+    font-weight: 700 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 3 !important;
+    -webkit-box-orient: vertical !important;
+  }
+
+  .journal-editorial-grid .blog-card:nth-child(1) .blog-card-meta,
+  .journal-editorial-grid .blog-card:nth-child(1) .blog-card-excerpt,
+  .journal-editorial-grid .blog-card:nth-child(1) .blog-card-footer {
+    display: none !important;
+  }
+
+  /* 3rd blog overall (2nd child in grid) - Crazy Big Diagonal Slashed Card */
+  .journal-editorial-grid .blog-card:nth-child(2) {
+    grid-column: span 2 !important;
+    flex-direction: row !important;
+    transform: rotate(1deg) translateY(-3px) !important;
+    border: 1px solid rgba(230, 57, 70, 0.35) !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35), 0 0 15px rgba(230, 57, 70, 0.08) !important;
+  }
+
+  .journal-editorial-grid .blog-card:nth-child(2)::before {
+    content: "03" !important;
+    font-size: 5.5rem !important;
+    bottom: -10px !important;
+    right: 15px !important;
+  }
+
+  .journal-editorial-grid .blog-card:nth-child(2):active {
+    transform: rotate(0deg) translateY(-8px) scale(1.02) !important;
+    border-color: var(--accent) !important;
+    box-shadow: 0 15px 35px rgba(230, 57, 70, 0.25) !important;
+    z-index: 10 !important;
+  }
+
+  .journal-editorial-grid .blog-card:nth-child(2) .blog-card-img-box {
+    width: 44% !important;
+    height: 100% !important;
+    min-height: 130px !important;
+    clip-path: polygon(0 0, 100% 0, 80% 100%, 0 100%) !important; /* Crazy diagonal slit cut */
+    z-index: 2 !important;
+  }
+
+  .journal-editorial-grid .blog-card:nth-child(2) .blog-card-content {
+    width: 56% !important;
+    padding: 0.85rem 0.5rem 0.85rem 0 !important;
+    margin-left: -5% !important; /* Overlap content on slashed image cutout */
+    gap: 0.35rem !important;
+    z-index: 1 !important;
+  }
+
+  .journal-editorial-grid .blog-card:nth-child(2) .blog-card-meta {
+    font-size: 0.62rem !important;
+    gap: 0.4rem !important;
+  }
+
+  .journal-editorial-grid .blog-card:nth-child(2) .blog-card-title {
+    font-size: 0.78rem !important;
+    line-height: 1.3 !important;
+    font-weight: 700 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 3 !important;
+    -webkit-box-orient: vertical !important;
+  }
+
+  .journal-editorial-grid .blog-card:nth-child(2) .blog-card-excerpt {
+    display: none !important;
+  }
+
+  .journal-editorial-grid .blog-card:nth-child(2) .blog-card-footer {
+    padding-top: 0.4rem !important;
+    margin-top: 0.2rem !important;
+  }
+
+  .journal-editorial-grid .blog-card:nth-child(2) .blog-card-readmore {
+    font-size: 0.72rem !important;
+  }
+
+  .journal-editorial-grid .blog-card:nth-child(2) .blog-card-read-time {
+    font-size: 0.68rem !important;
+  }
+
+  /* 4th or more blogs (Full Width Slashed Layout) */
+  .journal-editorial-grid .blog-card:nth-child(n+3) {
+    grid-column: span 3 !important;
+    flex-direction: row !important;
+    transform: none !important;
+  }
+
+  .journal-editorial-grid .blog-card:nth-child(n+3)::before {
+    display: none !important; /* Hide outline watermark for lower items */
+  }
+
+  .journal-editorial-grid .blog-card:nth-child(n+3) .blog-card-img-box {
+    width: 38% !important;
+    height: 100% !important;
+    min-height: 125px !important;
+    clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%) !important;
+    z-index: 2 !important;
+  }
+
+  .journal-editorial-grid .blog-card:nth-child(n+3) .blog-card-content {
+    width: 62% !important;
+    padding: 0.75rem 0.5rem 0.75rem 0 !important;
+    margin-left: -4% !important;
+    gap: 0.35rem !important;
+    z-index: 1 !important;
+  }
+
+  .journal-editorial-grid .blog-card:nth-child(n+3) .blog-card-meta {
+    font-size: 0.65rem !important;
+  }
+
+  .journal-editorial-grid .blog-card:nth-child(n+3) .blog-card-title {
+    font-size: 0.85rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .journal-editorial-grid .blog-card:nth-child(n+3) .blog-card-excerpt {
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    font-size: 0.75rem !important;
+    line-height: 1.4 !important;
+  }
+
+  .journal-editorial-grid .blog-card:nth-child(n+3) .blog-card-footer {
+    padding-top: 0.4rem !important;
+    margin-top: 0.2rem !important;
+  }
+
+  /* Journal Trending Sidebar Scaling & Effects */
+  .journal-sidebar-section {
+    margin-top: 1.5rem !important;
+  }
+
+  .journal-sidebar-title {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+    padding-bottom: 0.35rem !important;
+  }
+
+  .journal-quick-list {
+    gap: 1.15rem !important;
+  }
+
+  .journal-quick-item {
+    padding-bottom: 1.15rem !important;
+    gap: 1rem !important;
+    transition: transform 0.2s ease !important;
+  }
+
+  .journal-quick-item:active {
+    transform: translateX(4px) !important;
+  }
+
+  .journal-quick-num {
+    font-size: 1.85rem !important;
+  }
+
+  .journal-quick-title {
+    font-size: 0.95rem !important;
+    line-height: 1.35 !important;
   }
 
   /* Single Blog Post Page Mobile Scaling */
+  .blog-post-title {
+    font-size: 1.75rem !important;
+  }
+
   .blog-post-hero-image-box {
-    height: 260px !important;
+    height: 240px !important;
     margin-bottom: 2rem !important;
   }
 
   .blog-post-content h2 {
-    font-size: 1.45rem !important;
-    margin: 2.25rem 0 1rem 0 !important;
+    font-size: 1.35rem !important;
+    margin: 2rem 0 0.85rem 0 !important;
     padding-bottom: 0.5rem !important;
   }
 
   .blog-post-content h3 {
-    font-size: 1.2rem !important;
-    margin: 2rem 0 0.85rem 0 !important;
+    font-size: 1.15rem !important;
+    margin: 1.75rem 0 0.75rem 0 !important;
   }
 
   .blog-post-content p {
-    font-size: 0.95rem !important;
-    line-height: 1.7 !important;
-    margin-bottom: 1.25rem !important;
+    font-size: 0.92rem !important;
+    line-height: 1.65 !important;
+    margin-bottom: 1.15rem !important;
   }
 
   .blog-post-content blockquote {
     padding: 1rem 1.25rem !important;
     margin: 1.75rem 0 !important;
-    font-size: 1rem !important;
+    font-size: 0.95rem !important;
   }
 }
 
@@ -4787,19 +5468,77 @@ nextjs-portal,
 
   /* Tools list grid layout */
   .about-tools-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 0.75rem !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 0.5rem !important;
   }
 
   /* Contact page social links alignment */
   .contact-social-container {
-    flex-wrap: wrap !important;
-    gap: 0.75rem !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 0.4rem !important;
+    width: 100% !important;
   }
 
   .contact-social-btn {
-    width: 100% !important;
+    flex: 1 1 0px !important;
+    width: auto !important;
     justify-content: center !important;
+    padding: 0.45rem 0.3rem !important;
+    font-size: 0.72rem !important;
+    gap: 0.25rem !important;
+    white-space: nowrap !important;
+  }
+
+  .contact-mobile-badge-wrapper {
+    margin-top: 2rem !important;
+  }
+
+  /* Admin Login Page Mobile Specific Styles */
+  .admin-login-wrapper {
+    padding: 1rem !important;
+  }
+
+  .admin-login-card {
+    padding: 2rem 1.5rem !important;
+    max-width: 360px !important;
+    margin: 0 auto !important;
+  }
+
+  .admin-login-logo {
+    font-size: 1.6rem !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  .admin-login-h2 {
+    font-size: 1.25rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  .admin-login-p {
+    font-size: 0.78rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .admin-login-form {
+    gap: 0.85rem !important;
+  }
+
+  .admin-login-form .form-label {
+    font-size: 0.68rem !important;
+    margin-bottom: 0.2rem !important;
+  }
+
+  .admin-login-form .form-input {
+    font-size: 0.8rem !important;
+    padding: 0.55rem 0.75rem !important;
+  }
+
+  .admin-login-btn {
+    padding: 0.65rem !important;
+    font-size: 0.82rem !important;
+    margin-top: 0.25rem !important;
   }
 
   /* Premium Redesigned mobile footer layout */
@@ -4896,12 +5635,227 @@ nextjs-portal,
   .blog-post-hero-image-box {
     height: 180px !important;
   }
+
+  /* About Page Narrow Mobile Adjustments */
+  .about-title {
+    font-size: 1.5rem !important;
+  }
+
+  .about-subtitle {
+    font-size: 0.75rem !important;
+  }
+
+  .about-bio-p1 {
+    font-size: 0.9rem !important;
+  }
+
+  .about-bio-p2 {
+    font-size: 0.84rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .about-page .btn-primary {
+    padding: 0.65rem 1.25rem !important;
+    font-size: 0.8rem !important;
+  }
+
+  .about-section-heading {
+    font-size: 1.3rem !important;
+  }
+
+  .about-skills-wrapper {
+    gap: 1rem !important;
+  }
+
+  .about-tools-heading {
+    font-size: 0.95rem !important;
+  }
+
+  /* Scale down alternating tool cards slightly on narrow screens */
+  .about-tool-card:nth-child(6n+3),
+  .about-tool-card:nth-child(6n+4) {
+    padding: 0.75rem 0.6rem !important;
+    font-size: 0.78rem !important;
+  }
+
+  .about-tool-card:nth-child(6n+1),
+  .about-tool-card:nth-child(6n+2),
+  .about-tool-card:nth-child(6n+5),
+  .about-tool-card:nth-child(6n+6) {
+    padding: 0.65rem 0.25rem !important;
+    font-size: 0.68rem !important;
+  }
+
+  .about-timeline-role {
+    font-size: 0.95rem !important;
+  }
+
+  .about-timeline-company {
+    font-size: 0.78rem !important;
+  }
+
+  .about-timeline-desc {
+    font-size: 0.78rem !important;
+  }
+
+  /* Services Page Narrow Mobile Adjustments */
+  .services-page .section-title {
+    font-size: 1.75rem !important;
+  }
+
+  .service-card-title {
+    font-size: 1.05rem !important;
+  }
+
+  .service-card-desc {
+    font-size: 0.8rem !important;
+  }
+
+  .pricing-title {
+    font-size: 1.45rem !important;
+  }
+
+  .package-price {
+    font-size: 2rem !important;
+  }
+
+  .package-card {
+    padding: 1.75rem 1.15rem !important;
+    flex: 0 0 270px !important;
+  }
+
+  /* Blogs Page Narrow Mobile Adjustments */
+  .blogs-title {
+    font-size: 1.85rem !important;
+  }
+
+  .blogs-description {
+    font-size: 0.9rem !important;
+  }
+
+  .editorial-featured-title {
+    font-size: 1.15rem !important;
+  }
+
+  .editorial-featured-excerpt {
+    font-size: 0.8rem !important;
+  }
+
+  .journal-editorial-grid .blog-card-title {
+    font-size: 0.95rem !important;
+  }
+
+  .journal-editorial-grid .blog-card-excerpt {
+    font-size: 0.78rem !important;
+  }
+
+  .journal-sidebar-title {
+    font-size: 1rem !important;
+  }
+
+  .journal-quick-title {
+    font-size: 0.85rem !important;
+  }
+
+  .journal-quick-num {
+    font-size: 1.5rem !important;
+  }
+
+  /* Single Blog Post Page Narrow Mobile Scaling */
+  .blog-post-title {
+    font-size: 1.45rem !important;
+  }
+
+  .blog-post-content h2 {
+    font-size: 1.2rem !important;
+  }
+
+  .blog-post-content h3 {
+    font-size: 1.05rem !important;
+  }
+
+  .blog-post-content p {
+    font-size: 0.85rem !important;
+    line-height: 1.6 !important;
+  }
+
+  .blog-post-content blockquote {
+    padding: 0.8rem 1rem !important;
+    font-size: 0.88rem !important;
+  }
+
+  .blog-post-content ul,
+  .blog-post-content ol,
+  .blog-post-content li {
+    font-size: 0.85rem !important;
+  }
+
+  /* Contact Page Narrow Mobile Scaling */
+  .contact-info-title {
+    font-size: 1.55rem !important;
+  }
+
+  .contact-info-description {
+    font-size: 0.82rem !important;
+    line-height: 1.45 !important;
+  }
+
+  .contact-detail-link {
+    font-size: 0.78rem !important;
+  }
 }
 
 /* 3. Extremely Narrow Screen Mobile Adjustments (380px and below) */
 @media (max-width: 380px) {
+  .about-title {
+    font-size: 1.35rem !important;
+  }
+  .about-section-heading {
+    font-size: 1.2rem !important;
+  }
   .about-tools-grid {
-    grid-template-columns: 1fr !important;
+    gap: 0.35rem !important;
+  }
+  .about-tool-card:nth-child(6n+3),
+  .about-tool-card:nth-child(6n+4) {
+    padding: 0.6rem 0.4rem !important;
+    font-size: 0.72rem !important;
+  }
+  .about-tool-card:nth-child(6n+1),
+  .about-tool-card:nth-child(6n+2),
+  .about-tool-card:nth-child(6n+5),
+  .about-tool-card:nth-child(6n+6) {
+    padding: 0.5rem 0.2rem !important;
+    font-size: 0.62rem !important;
+  }
+  .services-page .section-title {
+    font-size: 1.55rem !important;
+  }
+  .pricing-title {
+    font-size: 1.3rem !important;
+  }
+  .package-price {
+    font-size: 1.75rem !important;
+  }
+  .blogs-title {
+    font-size: 1.55rem !important;
+  }
+  .editorial-featured-title {
+    font-size: 1.1rem !important;
+  }
+  .blog-post-title {
+    font-size: 1.25rem !important;
+  }
+  .contact-info-title {
+    font-size: 1.35rem !important;
+  }
+  .contact-social-container {
+    gap: 0.3rem !important;
+  }
+  .contact-social-btn {
+    padding: 0.4rem 0.2rem !important;
+    font-size: 0.65rem !important;
+    gap: 0.2rem !important;
   }
 }
 

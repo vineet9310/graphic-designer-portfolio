@@ -3,12 +3,14 @@
 import React, { use, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useBlogs } from '@/hooks/useBlogs';
+import { useSettings } from '@/hooks/useSettings';
 import { FaArrowLeft, FaCalendarAlt, FaClock, FaTag, FaInstagram, FaBehance, FaLinkedinIn } from 'react-icons/fa';
 
 const BlogDetail = ({ params: paramsPromise }) => {
   const params = use(paramsPromise);
   const { slug } = params;
   const { getBlogBySlugOrId, loading } = useBlogs();
+  const { settings, loading: settingsLoading } = useSettings();
   const [blog, setBlog] = useState(null);
 
   // Mock blogs content in case they click a mock item
@@ -139,7 +141,7 @@ const BlogDetail = ({ params: paramsPromise }) => {
     });
   };
 
-  if (loading && !blog) {
+  if ((loading || settingsLoading) && !blog) {
     return (
       <div className="about-loading-container">
         <div className="skeleton about-loading-skeleton" />
@@ -147,7 +149,17 @@ const BlogDetail = ({ params: paramsPromise }) => {
     );
   }
 
-  if (!blog && !loading) {
+  if (settings?.navbar?.blogs === false) {
+    return (
+      <div className="services-disabled-container" style={{ padding: '10rem 0', minHeight: '60vh', textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+        <h1 style={{ fontSize: '2rem', fontFamily: 'var(--font-heading)', marginBottom: '1rem', color: 'var(--text-primary)' }}>Page Not Found</h1>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', fontSize: '0.95rem' }}>This page is currently disabled by the site administrator.</p>
+        <Link href="/" className="btn-primary">Return Home</Link>
+      </div>
+    );
+  }
+
+  if (!blog && !loading && !settingsLoading) {
     return (
       <div className="blogs-page">
         <div className="container blog-detail-not-found">

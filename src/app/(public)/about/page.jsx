@@ -5,6 +5,8 @@ import { motion } from 'framer-motion';
 import { FaDownload, FaPaintBrush, FaFigma, FaLaptopCode, FaCube, FaCheck } from 'react-icons/fa';
 import { useSettings } from '@/hooks/useSettings';
 
+import Link from 'next/link';
+
 const About = () => {
   const { settings, loading } = useSettings();
 
@@ -76,6 +78,16 @@ const About = () => {
     return (
       <div className="about-loading-container">
         <div className="skeleton about-loading-skeleton" />
+      </div>
+    );
+  }
+
+  if (settings?.navbar?.about === false) {
+    return (
+      <div className="services-disabled-container" style={{ padding: '10rem 0', minHeight: '60vh', textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+        <h1 style={{ fontSize: '2rem', fontFamily: 'var(--font-heading)', marginBottom: '1rem', color: 'var(--text-primary)' }}>Page Not Found</h1>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', fontSize: '0.95rem' }}>This page is currently disabled by the site administrator.</p>
+        <Link href="/" className="btn-primary">Return Home</Link>
       </div>
     );
   }
@@ -183,13 +195,17 @@ const About = () => {
             </h3>
             <div className="about-tools-grid">
               {tools.map((t, i) => (
-                <div
+                <motion.div
                   key={i}
                   className="about-tool-card"
+                  initial={{ opacity: 0, y: 15 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: i * 0.08 }}
                 >
                   <span className="about-tool-icon">{t.icon}</span>
                   <span>{t.name}</span>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>

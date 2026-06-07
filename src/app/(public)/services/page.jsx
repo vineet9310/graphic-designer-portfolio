@@ -17,6 +17,16 @@ const Services = () => {
     );
   }
 
+  if (settings?.navbar?.services === false) {
+    return (
+      <div className="services-disabled-container" style={{ padding: '10rem 0', minHeight: '60vh', textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+        <h1 style={{ fontSize: '2rem', fontFamily: 'var(--font-heading)', marginBottom: '1rem', color: 'var(--text-primary)' }}>Page Not Found</h1>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', fontSize: '0.95rem' }}>This page is currently disabled by the site administrator.</p>
+        <Link href="/" className="btn-primary">Return Home</Link>
+      </div>
+    );
+  }
+
   // Helper to map icons dynamically based on index or title
   const getServiceIcon = (title, idx) => {
     if (!title || typeof title !== 'string') {

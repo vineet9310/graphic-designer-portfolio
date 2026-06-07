@@ -6,6 +6,8 @@ import { FaInstagram, FaBehance, FaLinkedinIn, FaEnvelope, FaMapMarkerAlt, FaPho
 import ContactForm from '@/components/ContactForm';
 import { useSettings } from '@/hooks/useSettings';
 
+import Link from 'next/link';
+
 const Contact = () => {
   const { settings, loading } = useSettings();
 
@@ -13,6 +15,16 @@ const Contact = () => {
     return (
       <div className="contact-loading-container">
         <div className="skeleton contact-loading-circle" />
+      </div>
+    );
+  }
+
+  if (settings?.navbar?.contact === false) {
+    return (
+      <div className="services-disabled-container" style={{ padding: '10rem 0', minHeight: '60vh', textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+        <h1 style={{ fontSize: '2rem', fontFamily: 'var(--font-heading)', marginBottom: '1rem', color: 'var(--text-primary)' }}>Page Not Found</h1>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', fontSize: '0.95rem' }}>This page is currently disabled by the site administrator.</p>
+        <Link href="/" className="btn-primary">Return Home</Link>
       </div>
     );
   }
@@ -66,11 +78,6 @@ const Contact = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="pulsing-badge-container">
-              <div className="pulsing-dot" />
-              <span className="pulsing-badge-text">Available for Freelance & Q3 Projects</span>
-            </div>
-
             <p className="contact-info-subtitle">
               Let's Talk
             </p>
@@ -126,6 +133,14 @@ const Contact = () => {
                 ))}
               </div>
             </div>
+
+            {/* Desktop-only availability badge below socials */}
+            <div className="contact-desktop-badge-wrapper">
+              <div className="pulsing-badge-container">
+                <div className="pulsing-dot" />
+                <span className="pulsing-badge-text">Available for Freelance & Q3 Projects</span>
+              </div>
+            </div>
           </motion.div>
 
           {/* Column 2: Form */}
@@ -141,6 +156,19 @@ const Contact = () => {
             <ContactForm />
           </motion.div>
         </div>
+
+        {/* Bottom Availability Badge (Mobile only) */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.25 }}
+          className="contact-mobile-badge-wrapper"
+        >
+          <div className="pulsing-badge-container">
+            <div className="pulsing-dot" />
+            <span className="pulsing-badge-text">Available for Freelance & Q3 Projects</span>
+          </div>
+        </motion.div>
 
       </div>
     </div>

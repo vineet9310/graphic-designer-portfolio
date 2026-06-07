@@ -8,7 +8,7 @@ const ContactForm = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    subject: 'General Inquiry',
+    subject: '',
     message: ''
   });
   const [loading, setLoading] = useState(false);
@@ -41,7 +41,7 @@ const ContactForm = () => {
         setFormData({
           name: '',
           email: '',
-          subject: 'General Inquiry',
+          subject: '',
           message: ''
         });
       } else {
@@ -69,7 +69,7 @@ const ContactForm = () => {
           onChange={handleChange}
           required
           className="form-input"
-          placeholder="John Doe"
+          placeholder="Enter name here..."
           disabled={loading}
         />
       </div>
@@ -85,7 +85,7 @@ const ContactForm = () => {
           onChange={handleChange}
           required
           className="form-input"
-          placeholder="john@example.com"
+          placeholder="Enter email here..."
           disabled={loading}
         />
       </div>
@@ -100,7 +100,9 @@ const ContactForm = () => {
           onChange={handleChange}
           className="form-select"
           disabled={loading}
+          required
         >
+          <option value="" disabled hidden>Select subject here...</option>
           <option value="General Inquiry">General Inquiry</option>
           <option value="Logo Design">Logo Design</option>
           <option value="Brand Identity">Brand Identity</option>
@@ -121,7 +123,7 @@ const ContactForm = () => {
           onChange={handleChange}
           required
           className="form-textarea"
-          placeholder="Describe your project, timeline, and budget..."
+          placeholder="Enter message here..."
           disabled={loading}
         />
       </div>

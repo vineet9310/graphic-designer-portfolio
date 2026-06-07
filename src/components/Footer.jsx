@@ -22,13 +22,13 @@ const Footer = () => {
   ];
 
   const quickLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'Portfolio', path: '/portfolio' },
-    { name: 'About', path: '/about' },
-    { name: 'Services', path: '/services' },
-    { name: 'Blogs', path: '/blogs' },
-    { name: 'Contact', path: '/contact' }
-  ];
+    { name: 'Home', path: '/', visible: settings?.navbar?.home !== false },
+    { name: 'Portfolio', path: '/portfolio', visible: settings?.navbar?.portfolio !== false },
+    { name: 'About', path: '/about', visible: settings?.navbar?.about !== false },
+    { name: 'Services', path: '/services', visible: settings?.navbar?.services !== false },
+    { name: 'Blogs', path: '/blogs', visible: settings?.navbar?.blogs !== false },
+    { name: 'Contact', path: '/contact', visible: settings?.navbar?.contact !== false }
+  ].filter(link => link.visible);
 
   return (
     <footer className="footer">

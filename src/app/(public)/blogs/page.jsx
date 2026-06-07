@@ -6,13 +6,34 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useBlogs } from '@/hooks/useBlogs';
 import { FaArrowRight } from 'react-icons/fa';
 
+import { useSettings } from '@/hooks/useSettings';
+
 const Blogs = () => {
   const { blogs, loading, fetchBlogs } = useBlogs();
+  const { settings, loading: settingsLoading } = useSettings();
   const [selectedFilter, setSelectedFilter] = useState('All');
 
   useEffect(() => {
     fetchBlogs();
   }, [fetchBlogs]);
+
+  if (settingsLoading) {
+    return (
+      <div className="about-loading-container" style={{ padding: '10rem 0', minHeight: '60vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <div className="skeleton about-loading-skeleton" />
+      </div>
+    );
+  }
+
+  if (settings?.navbar?.blogs === false) {
+    return (
+      <div className="services-disabled-container" style={{ padding: '10rem 0', minHeight: '60vh', textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+        <h1 style={{ fontSize: '2rem', fontFamily: 'var(--font-heading)', marginBottom: '1rem', color: 'var(--text-primary)' }}>Page Not Found</h1>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', fontSize: '0.95rem' }}>This page is currently disabled by the site administrator.</p>
+        <Link href="/" className="btn-primary">Return Home</Link>
+      </div>
+    );
+  }
 
   const categories = [
     'All',
