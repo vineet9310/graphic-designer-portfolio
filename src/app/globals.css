@@ -4017,6 +4017,112 @@ button, input, select, textarea {
   }
 }
 
+/* Portrait Image Upload Box */
+.admin-portrait-upload-box {
+  border: 2px dashed var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+  background-color: var(--bg-surface);
+  overflow: hidden;
+  min-height: 140px;
+}
+
+.admin-portrait-upload-box:hover {
+  border-color: var(--accent);
+}
+
+.admin-portrait-upload-box.dragging {
+  border-color: var(--accent);
+  background-color: rgba(230, 57, 70, 0.08);
+}
+
+.admin-portrait-upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 1.5rem;
+  cursor: pointer;
+}
+
+.admin-portrait-preview-container {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+}
+
+.admin-portrait-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.admin-portrait-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.admin-portrait-preview-container:hover .admin-portrait-overlay {
+  opacity: 1;
+}
+
+.admin-portrait-remove-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  color: var(--accent);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: background-color 0.2s;
+}
+
+.admin-portrait-remove-btn:hover {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.admin-portrait-url-row {
+  position: relative;
+  margin-top: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.admin-portrait-url-or {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  padding: 0.1rem 0.5rem;
+  border-radius: 3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 /* Settings Page Specific Classes */
 .admin-settings-tabs-nav {
   display: flex;

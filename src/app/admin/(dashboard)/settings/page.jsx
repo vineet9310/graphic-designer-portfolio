@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSettings } from '@/hooks/useSettings';
 import { toast } from 'react-hot-toast';
-import { FaSave, FaPlus, FaTrashAlt, FaStar, FaRegStar, FaTimes } from 'react-icons/fa';
+import { FaSave, FaPlus, FaTrashAlt, FaStar, FaRegStar, FaTimes, FaUpload, FaTrash } from 'react-icons/fa';
+import api from '@/utils/api';
 
 const AdminSettings = () => {
   const { settings, loading, error, updateSettings } = useSettings();
@@ -22,6 +23,9 @@ const AdminSettings = () => {
   const [timeline, setTimeline] = useState([]);
   const [services, setServices] = useState([]);
   const [packages, setPackages] = useState([]);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isUploadingPortrait, setIsUploadingPortrait] = useState(false);
+  const portraitInputRef = useRef(null);
 
   // Sync state once data loaded
   useEffect(() => {
@@ -59,6 +63,58 @@ const AdminSettings = () => {
   const handleHeroChange = (e) => setHero({ ...hero, [e.target.name]: e.target.value });
   const handleAboutChange = (e) => setAbout({ ...about, [e.target.name]: e.target.value });
   const handleContactChange = (e) => setContact({ ...contact, [e.target.name]: e.target.value });
+
+  // Portrait image upload handlers
+  const uploadPortrait = async (file) => {
+    if (!file || !file.type.startsWith('image/')) {
+      toast.error('Please select a valid image file');
+      return;
+    }
+    setIsUploadingPortrait(true);
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await api('/upload', { method: 'POST', body: formData });
+      if (response.success) {
+        setAbout((prev) => ({ ...prev, portraitImage: response.url }));
+        toast.success('Portrait image uploaded successfully');
+      } else {
+        toast.error(response.message || 'Upload failed');
+      }
+    } catch (err) {
+      toast.error('Upload failed: ' + err.message);
+    } finally {
+      setIsUploadingPortrait(false);
+    }
+  };
+
+  const handlePortraitDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file) uploadPortrait(file);
+  };
+
+  const handlePortraitDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handlePortraitDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handlePortraitSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) uploadPortrait(file);
+    e.target.value = '';
+  };
+
+  const removePortrait = () => {
+    setAbout((prev) => ({ ...prev, portraitImage: '' }));
+  };
 
   // Arrays modifications: Stats
   const handleStatChange = (idx, field, value) => {
@@ -318,14 +374,76 @@ const AdminSettings = () => {
               <div className="admin-form">
                 <div className="admin-form-row">
                   <div className="form-group">
-                    <label className="form-label">Bio Portrait Image URL</label>
-                    <input
-                      type="text"
-                      name="portraitImage"
-                      value={about.portraitImage}
-                      onChange={handleAboutChange}
-                      className="form-input"
-                    />
+                    <label className="form-label">Bio Portrait Image</label>
+
+                    {/* Drop zone */}
+                    <div
+                      className={`admin-portrait-upload-box ${isDragging ? 'dragging' : ''}`}
+                      onDrop={handlePortraitDrop}
+                      onDragOver={handlePortraitDragOver}
+                      onDragLeave={handlePortraitDragLeave}
+                    >
+                      {about.portraitImage ? (
+                        <div
+                          className="admin-portrait-preview-container"
+                          onClick={() => portraitInputRef.current?.click()}
+                        >
+                          <img
+                            src={about.portraitImage}
+                            alt="Portrait preview"
+                            className="admin-portrait-preview"
+                          />
+                          <div className="admin-portrait-overlay">
+                            <FaUpload />
+                            <span>Drag or click to replace</span>
+                          </div>
+                          <button
+                            type="button"
+                            className="admin-portrait-remove-btn"
+                            onClick={(e) => { e.stopPropagation(); removePortrait(); }}
+                            title="Remove portrait"
+                          >
+                            <FaTrash />
+                          </button>
+                          <input
+                            ref={portraitInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={handlePortraitSelect}
+                            className="admin-project-upload-input"
+                          />
+                        </div>
+                      ) : (
+                        <label className="admin-portrait-upload-label">
+                          <FaUpload className="admin-project-upload-icon" />
+                          <span className="admin-project-upload-text">
+                            {isUploadingPortrait ? 'Uploading...' : 'Drag & drop or click to upload portrait'}
+                          </span>
+                          <span className="admin-project-upload-subtext">
+                            Supports JPEG, PNG, WEBP
+                          </span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handlePortraitSelect}
+                            className="admin-project-upload-input"
+                          />
+                        </label>
+                      )}
+                    </div>
+
+                    {/* URL input fallback */}
+                    <div className="admin-portrait-url-row">
+                      <span className="admin-portrait-url-or">OR</span>
+                      <input
+                        type="text"
+                        name="portraitImage"
+                        value={about.portraitImage}
+                        onChange={handleAboutChange}
+                        className="form-input"
+                        placeholder="Paste image URL directly..."
+                      />
+                    </div>
                   </div>
                   <div className="form-group">
                     <label className="form-label">Resume Link (PDF URL)</label>
