@@ -28,7 +28,7 @@ const ProjectCard = ({ project, onClick }) => {
         {/* Hover Overlay with Red Tint and View Project Text */}
         <div className="project-card-overlay">
           <span className="project-card-text">
-            View Project
+            View Projects
           </span>
         </div>
       </div>
