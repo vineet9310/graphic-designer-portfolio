@@ -15,6 +15,8 @@ const AdminProjects = () => {
   // Form Fields State
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('Logo Design');
+  const [customCategory, setCustomCategory] = useState('');
+  const [showCustomCategory, setShowCustomCategory] = useState(false);
   const [description, setDescription] = useState('');
   const [toolInput, setToolInput] = useState('');
   const [tools, setTools] = useState([]);
@@ -26,7 +28,7 @@ const AdminProjects = () => {
   const [newImagePreviews, setNewImagePreviews] = useState([]); // Preview URLs for new files
   const [existingImages, setExistingImages] = useState([]); // URLs loaded during editing
 
-  const categories = ['Logo Design', 'Branding', 'UI/UX', 'Print', 'Social Media', 'Illustration', 'Other'];
+  const [dynamicCategories, setDynamicCategories] = useState(['Logo Design', 'Branding', 'UI/UX', 'Print', 'Social Media', 'Illustration']);
 
   const fetchProjects = async () => {
     try {
@@ -34,6 +36,12 @@ const AdminProjects = () => {
       const response = await api('/projects');
       if (response.success) {
         setProjects(response.data);
+        
+        // Dynamically build category options from data
+        const defaults = ['Logo Design', 'Branding', 'UI/UX', 'Print', 'Social Media', 'Illustration'];
+        const dbCats = response.data.map(p => p.category).filter(Boolean);
+        const combined = Array.from(new Set([...defaults, ...dbCats]));
+        setDynamicCategories(combined);
       }
     } catch (error) {
       console.error('Error loading projects:', error.message);
@@ -50,6 +58,8 @@ const AdminProjects = () => {
   const resetForm = () => {
     setTitle('');
     setCategory('Logo Design');
+    setCustomCategory('');
+    setShowCustomCategory(false);
     setDescription('');
     setToolInput('');
     setTools([]);
@@ -138,7 +148,19 @@ const AdminProjects = () => {
     resetForm();
     setCurrentProjectId(project._id);
     setTitle(project.title);
-    setCategory(project.category);
+
+    const defaults = ['Logo Design', 'Branding', 'UI/UX', 'Print', 'Social Media', 'Illustration'];
+    if (defaults.includes(project.category)) {
+      setCategory(project.category);
+      setShowCustomCategory(false);
+    } else {
+      if (!dynamicCategories.includes(project.category)) {
+        setDynamicCategories(prev => [...prev, project.category]);
+      }
+      setCategory(project.category);
+      setShowCustomCategory(false);
+    }
+
     setDescription(project.description);
     setTools(project.tools || []);
     setFeatured(project.featured);
@@ -170,7 +192,9 @@ const AdminProjects = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!title || !description || !category) {
+    const finalCategory = showCustomCategory || category === 'Other' ? customCategory.trim() : category;
+
+    if (!title || !description || !finalCategory) {
       toast.error('Please enter title, description, and category.');
       return;
     }
@@ -185,7 +209,7 @@ const AdminProjects = () => {
     // Construct FormData to support file upload
     const formData = new FormData();
     formData.append('title', title);
-    formData.append('category', category);
+    formData.append('category', finalCategory);
     formData.append('description', description);
     formData.append('tools', JSON.stringify(tools));
     formData.append('featured', featured);
@@ -347,7 +371,7 @@ const AdminProjects = () => {
             <form onSubmit={handleSubmit} className="admin-form">
               
               {/* Title & Category Row */}
-              <div className="admin-form-row">
+              <div className="admin-form-row" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                 <div className="form-group">
                   <label htmlFor="title" className="form-label">Project Title</label>
                   <input
@@ -362,17 +386,74 @@ const AdminProjects = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="category" className="form-label">Category</label>
-                  <select
-                    id="category"
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="form-select"
-                  >
-                    {categories.map((cat) => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
+                  <label className="form-label" style={{ marginBottom: '0.75rem' }}>Project Category</label>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                    {dynamicCategories.map((cat) => {
+                      const isActive = category === cat && !showCustomCategory;
+                      return (
+                        <button
+                          type="button"
+                          key={cat}
+                          onClick={() => {
+                            setCategory(cat);
+                            setShowCustomCategory(false);
+                          }}
+                          style={{
+                            border: 'none',
+                            outline: 'none',
+                            cursor: 'pointer',
+                            padding: '0.5rem 1rem',
+                            borderRadius: '20px',
+                            fontSize: '0.8rem',
+                            fontWeight: '600',
+                            backgroundColor: isActive ? 'var(--accent)' : 'rgba(255,255,255,0.04)',
+                            color: isActive ? '#fff' : 'var(--text-secondary)',
+                            border: isActive ? '1px solid var(--accent)' : '1px solid var(--border)',
+                            transition: 'all 0.2s',
+                          }}
+                        >
+                          {cat}
+                        </button>
+                      );
+                    })}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCategory('Other');
+                        setShowCustomCategory(true);
+                      }}
+                      style={{
+                        border: 'none',
+                        outline: 'none',
+                        cursor: 'pointer',
+                        padding: '0.5rem 1rem',
+                        borderRadius: '20px',
+                        fontSize: '0.8rem',
+                        fontWeight: '600',
+                        backgroundColor: showCustomCategory ? 'var(--accent)' : 'rgba(255,255,255,0.04)',
+                        color: showCustomCategory ? '#fff' : 'var(--accent)',
+                        border: showCustomCategory ? '1px solid var(--accent)' : '1px dashed var(--accent)',
+                        transition: 'all 0.2s',
+                      }}
+                    >
+                      + Other Category
+                    </button>
+                  </div>
+
+                  {showCustomCategory && (
+                    <div style={{ animation: 'fadeIn 0.2s ease-in-out', marginTop: '0.75rem' }}>
+                      <label className="form-label" style={{ fontSize: '0.75rem', color: 'var(--accent)' }}>Specify Custom Category Name</label>
+                      <input
+                        type="text"
+                        value={customCategory}
+                        onChange={(e) => setCustomCategory(e.target.value)}
+                        className="form-input"
+                        placeholder="e.g. 3D Design, Editorial, Packaging..."
+                        required={showCustomCategory}
+                        style={{ marginTop: '0.25rem', width: '100%' }}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -423,13 +504,16 @@ const AdminProjects = () => {
                 <label className="form-label">Project Images (Up to 10 files. First will be cover)</label>
                 
                 {/* Drag/Drop Box */}
-                <label className="admin-project-upload-box">
+                <label className="admin-project-upload-box" style={{ border: '2px dashed var(--accent)', transition: 'all 0.2s', cursor: 'pointer' }}>
                   <FaUpload className="admin-project-upload-icon" />
                   <span className="admin-project-upload-text">
                     Click to choose or drag images here
                   </span>
                   <span className="admin-project-upload-subtext">
                     Supports JPEG, JPG, PNG, WEBP (Max 10MB)
+                  </span>
+                  <span className="admin-project-upload-subtext" style={{ fontSize: '0.75rem', color: 'var(--accent)', marginTop: '0.2rem' }}>
+                    Recommended size: 7:5 landscape aspect ratio (e.g. 800 x 560 px)
                   </span>
                   <input
                     type="file"
@@ -441,34 +525,52 @@ const AdminProjects = () => {
                 </label>
 
                 {/* Previews Collection */}
-                <div className="admin-project-previews-grid">
+                <div className="admin-project-previews-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
                   {/* Existing Images (loaded during Edit) */}
-                  {existingImages.map((imgUrl, idx) => (
-                    <div key={`exist-${idx}`} className="admin-project-preview-item">
-                      <img src={imgUrl} alt="Existing Preview" className="admin-project-preview-img" />
-                      <button
-                        type="button"
-                        onClick={() => removeExistingImage(imgUrl)}
-                        className="admin-project-preview-remove-btn"
-                      >
-                        <FaTimes className="blogs-icon-arrow" />
-                      </button>
-                    </div>
-                  ))}
+                  {existingImages.map((imgUrl, idx) => {
+                    const isCover = idx === 0;
+                    return (
+                      <div key={`exist-${idx}`} className="admin-project-preview-item" style={{ position: 'relative', borderRadius: '8px', overflow: 'hidden', border: isCover ? '2px solid var(--accent)' : '1px solid var(--border)', aspectRatio: '7/5' }}>
+                        <img src={imgUrl} alt="Existing Preview" className="admin-project-preview-img" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        {isCover && (
+                          <span style={{ position: 'absolute', top: '5px', left: '5px', backgroundColor: 'var(--accent)', color: '#fff', fontSize: '0.65rem', fontWeight: 'bold', padding: '2px 6px', borderRadius: '4px' }}>
+                            Cover
+                          </span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => removeExistingImage(imgUrl)}
+                          className="admin-project-preview-remove-btn"
+                          style={{ position: 'absolute', top: '5px', right: '5px', border: 'none', background: 'rgba(0,0,0,0.6)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '20px', height: '20px', borderRadius: '50%', color: '#fff' }}
+                        >
+                          <FaTimes style={{ fontSize: '0.7rem' }} />
+                        </button>
+                      </div>
+                    );
+                  })}
 
                   {/* New Upload Previews */}
-                  {newImagePreviews.map((previewUrl, idx) => (
-                    <div key={`new-${idx}`} className="admin-project-preview-item new-upload">
-                      <img src={previewUrl} alt="New Preview" className="admin-project-preview-img" />
-                      <button
-                        type="button"
-                        onClick={() => removeNewImagePreview(idx)}
-                        className="admin-project-preview-remove-btn"
-                      >
-                        <FaTimes className="blogs-icon-arrow" />
-                      </button>
-                    </div>
-                  ))}
+                  {newImagePreviews.map((previewUrl, idx) => {
+                    const isCover = existingImages.length === 0 && idx === 0;
+                    return (
+                      <div key={`new-${idx}`} className="admin-project-preview-item new-upload" style={{ position: 'relative', borderRadius: '8px', overflow: 'hidden', border: isCover ? '2px solid var(--accent)' : '1px solid var(--border)', aspectRatio: '7/5' }}>
+                        <img src={previewUrl} alt="New Preview" className="admin-project-preview-img" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        {isCover && (
+                          <span style={{ position: 'absolute', top: '5px', left: '5px', backgroundColor: 'var(--accent)', color: '#fff', fontSize: '0.65rem', fontWeight: 'bold', padding: '2px 6px', borderRadius: '4px' }}>
+                            Cover
+                          </span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => removeNewImagePreview(idx)}
+                          className="admin-project-preview-remove-btn"
+                          style={{ position: 'absolute', top: '5px', right: '5px', border: 'none', background: 'rgba(0,0,0,0.6)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '20px', height: '20px', borderRadius: '50%', color: '#fff' }}
+                        >
+                          <FaTimes style={{ fontSize: '0.7rem' }} />
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 

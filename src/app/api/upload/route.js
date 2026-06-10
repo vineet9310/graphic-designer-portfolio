@@ -26,7 +26,8 @@ const uploadToLocal = async (file) => {
     fs.mkdirSync(localUploadsDir, { recursive: true });
   }
   const buffer = Buffer.from(await file.arrayBuffer());
-  const filename = `portrait-${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.name || '.jpg')}`;
+  const prefix = file.type === 'application/pdf' ? 'document' : 'portrait';
+  const filename = `${prefix}-${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.name || '.jpg')}`;
   const filepath = path.join(localUploadsDir, filename);
   await fs.promises.writeFile(filepath, buffer);
   return `/uploads/${filename}`;
@@ -35,10 +36,18 @@ const uploadToLocal = async (file) => {
 const uploadToCloudinary = async (file) => {
   const buffer = Buffer.from(await file.arrayBuffer());
   const base64Image = `data:${file.type};base64,${buffer.toString('base64')}`;
-  const result = await cloudinary.uploader.upload(base64Image, {
-    folder: 'designer-portfolio/settings',
-    transformation: [{ width: 800, crop: 'limit', quality: 85 }]
-  });
+  
+  const options = {
+    folder: 'designer-portfolio/settings'
+  };
+
+  if (file.type === 'application/pdf') {
+    options.resource_type = 'raw';
+  } else {
+    options.transformation = [{ width: 800, crop: 'limit', quality: 85 }];
+  }
+
+  const result = await cloudinary.uploader.upload(base64Image, options);
   return result.secure_url;
 };
 

@@ -173,6 +173,46 @@ const BlogDetail = ({ params: paramsPromise }) => {
     );
   }
 
+  const renderBlogContent = (content) => {
+    if (!content) return null;
+    
+    // Check if content has HTML elements (like <p>, <br>, <h2>, <ul>, etc.)
+    const hasHtml = /<[a-z][\s\S]*>/i.test(content);
+    
+    if (hasHtml) {
+      return (
+        <div 
+          className="blog-post-content"
+          dangerouslySetInnerHTML={{ __html: content }}
+        />
+      );
+    }
+    
+    // Otherwise, treat as raw text:
+    const paragraphs = content
+      .split(/\n\s*\n/)
+      .map(p => p.trim())
+      .filter(p => p.length > 0);
+      
+    return (
+      <div className="blog-post-content raw-text-content">
+        {paragraphs.map((para, idx) => {
+          const lines = para.split('\n');
+          return (
+            <p key={idx} style={{ marginBottom: '1.8rem', lineHeight: '1.8', color: 'var(--text-secondary)' }}>
+              {lines.map((line, lIdx) => (
+                <React.Fragment key={lIdx}>
+                  {line}
+                  {lIdx < lines.length - 1 && <br />}
+                </React.Fragment>
+              ))}
+            </p>
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
     <article className="blog-post-page">
       <div className="container">
@@ -211,10 +251,7 @@ const BlogDetail = ({ params: paramsPromise }) => {
           
           {/* Main Article Body */}
           <div>
-            <div 
-              className="blog-post-content"
-              dangerouslySetInnerHTML={{ __html: blog.content }}
-            />
+            {renderBlogContent(blog.content)}
 
             {/* Tags Footer inside main body */}
             {blog.tags && blog.tags.length > 0 && (

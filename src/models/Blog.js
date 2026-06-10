@@ -20,11 +20,7 @@ const blogSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    required: [true, 'Please add a category'],
-    enum: {
-      values: ['Design Theory', 'Case Study', 'UI/UX Insights', 'Branding', 'Typography', 'Vector Art', 'Other'],
-      message: '{VALUE} is not a supported category'
-    }
+    required: [true, 'Please add a category']
   },
   tags: {
     type: [String],

@@ -37,16 +37,6 @@ const Portfolio = () => {
     );
   }
 
-  const categories = [
-    'All',
-    'Logo Design',
-    'Branding',
-    'UI/UX',
-    'Print',
-    'Social Media',
-    'Illustration'
-  ];
-
   // In case database is empty, fall back to mock projects to demonstrate visual elegance and filter mechanics
   const mockProjects = [
     { _id: 'm1', title: 'Aether Brand Identity', category: 'Branding', coverImage: 'https://images.unsplash.com/photo-1522542550221-31fd19575a2d?w=800&auto=format&fit=crop&q=80', description: 'Complete brand conceptualization, visual assets, and style guide for Aether Tech, a cloud computing platform focusing on modern, high-contrast, scalable iconography.', tools: ['Illustrator', 'Figma', 'Photoshop'], images: ['https://images.unsplash.com/photo-1522542550221-31fd19575a2d?w=800&auto=format&fit=crop&q=80', 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80'] },
@@ -58,6 +48,11 @@ const Portfolio = () => {
   ];
 
   const activeProjects = projects.length > 0 ? projects : mockProjects;
+
+  // Dynamically extract categories from current active projects
+  const defaults = ['Logo Design', 'Branding', 'UI/UX', 'Print', 'Social Media', 'Illustration'];
+  const projectCats = activeProjects.map(p => p.category).filter(Boolean);
+  const categories = ['All', ...Array.from(new Set([...defaults, ...projectCats]))];
 
   const filteredProjects = selectedFilter === 'All'
     ? activeProjects

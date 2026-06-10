@@ -35,16 +35,6 @@ const Blogs = () => {
     );
   }
 
-  const categories = [
-    'All',
-    'Design Theory',
-    'Case Study',
-    'UI/UX Insights',
-    'Branding',
-    'Typography',
-    'Vector Art'
-  ];
-
   // Mock blogs fallback in case database is empty so page looks amazing out-of-the-box
   const mockBlogs = [
     {
@@ -83,6 +73,12 @@ const Blogs = () => {
   ];
 
   const activeBlogs = blogs && blogs.length > 0 ? blogs : mockBlogs;
+
+  // Build categories list dynamically based on unique active blog categories
+  const categories = [
+    'All',
+    ...Array.from(new Set(activeBlogs.map(b => b.category).filter(Boolean)))
+  ];
 
   const filteredBlogs = selectedFilter === 'All'
     ? activeBlogs

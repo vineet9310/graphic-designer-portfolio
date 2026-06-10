@@ -16,11 +16,7 @@ const projectSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    required: [true, 'Please add a category'],
-    enum: {
-      values: ['Logo Design', 'Branding', 'UI/UX', 'Print', 'Social Media', 'Illustration', 'Other'],
-      message: '{VALUE} is not a supported category'
-    }
+    required: [true, 'Please add a category']
   },
   tools: {
     type: [String],
