@@ -20,6 +20,14 @@ const Home = () => {
     fetchBlogs({ limit: 3 });
   }, [fetchFeaturedProjects, fetchBlogs]);
 
+  if (settingsLoading) {
+    return (
+      <div className="about-loading-container" style={{ padding: '10rem 0', minHeight: '60vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <div className="skeleton about-loading-skeleton" />
+      </div>
+    );
+  }
+
   // Fallback defaults in case settings is still loading/empty
   const toolsList = settings?.tools && settings.tools.length > 0 
     ? settings.tools 
