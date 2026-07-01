@@ -130,59 +130,171 @@ export async function PUT(req, { params }) {
     const toolsStr = formData.get('tools');
     const featuredStr = formData.get('featured');
     const orderStr = formData.get('order');
-    const existingImagesStr = formData.get('existingImages');
+    const metadataStr = formData.get('imagesMetadata');
 
-    // Process existing images to keep
-    let keptImages = [];
-    if (existingImagesStr) {
-      try {
-        keptImages = JSON.parse(existingImagesStr);
-      } catch (e) {
-        keptImages = [existingImagesStr];
+    // Process hero image
+    const heroFile = formData.get('heroImage');
+    const existingHeroImage = formData.get('existingHeroImage');
+    let coverImage = project.coverImage || '';
+
+    if (heroFile && typeof heroFile !== 'string') {
+      // Delete old cover image first
+      if (project.coverImage) {
+        await deleteImageFromStorage(project.coverImage);
       }
-    }
-
-    // Find images to delete
-    const imagesToDelete = project.images.filter(img => !keptImages.includes(img));
-    for (const img of imagesToDelete) {
-      await deleteImageFromStorage(img);
-    }
-
-    // Process new uploaded images
-    const files = formData.getAll('images');
-    let newImages = [];
-
-    for (const file of files) {
-      if (!file || typeof file === 'string') continue;
       
+      // Upload new hero image
       if (isCloudinaryConfigured) {
-        const buffer = Buffer.from(await file.arrayBuffer());
-        const base64Image = `data:${file.type};base64,${buffer.toString('base64')}`;
-        
-        console.log(`Uploading new ${file.name} to Cloudinary...`);
+        const buffer = Buffer.from(await heroFile.arrayBuffer());
+        const base64Image = `data:${heroFile.type};base64,${buffer.toString('base64')}`;
         const result = await cloudinary.uploader.upload(base64Image, {
           folder: 'designer-portfolio/projects',
           transformation: [{ width: 1200, crop: 'limit', quality: 85 }]
         });
-        newImages.push(result.secure_url);
+        coverImage = result.secure_url;
       } else {
         const localUploadsDir = path.join(process.cwd(), 'public/uploads');
         if (!fs.existsSync(localUploadsDir)) {
           fs.mkdirSync(localUploadsDir, { recursive: true });
         }
-
-        const buffer = Buffer.from(await file.arrayBuffer());
-        const filename = `images-${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.name || '.jpg')}`;
+        const buffer = Buffer.from(await heroFile.arrayBuffer());
+        const filename = `hero-${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(heroFile.name || '.jpg')}`;
         const filepath = path.join(localUploadsDir, filename);
-        
-        console.log(`Saving new ${file.name} locally to public/uploads...`);
         await fs.promises.writeFile(filepath, buffer);
-        newImages.push(`/uploads/${filename}`);
+        coverImage = `/uploads/${filename}`;
       }
+    } else if (!existingHeroImage && !heroFile) {
+      // Cover image was deleted
+      if (project.coverImage) {
+        await deleteImageFromStorage(project.coverImage);
+      }
+      coverImage = '';
     }
 
-    const finalImages = [...keptImages, ...newImages];
-    const coverImage = finalImages.length > 0 ? finalImages[0] : '';
+    let finalImages = [];
+    
+    if (metadataStr) {
+      let metadata = [];
+      try {
+        metadata = JSON.parse(metadataStr);
+      } catch (e) {
+        console.error('Error parsing imagesMetadata in PUT:', e);
+      }
+
+      // 1. Identify which existing images are kept vs deleted.
+      const keptUrls = metadata
+        .filter(item => item.type === 'existing')
+        .map(item => item.url);
+
+      const originalUrls = project.images.map(img => typeof img === 'string' ? img : img.url);
+      const imagesToDelete = originalUrls.filter(url => !keptUrls.includes(url));
+
+      for (const imgUrl of imagesToDelete) {
+        await deleteImageFromStorage(imgUrl);
+      }
+
+      // 2. Build finalImages in the specified order.
+      for (const item of metadata) {
+        if (item.type === 'existing') {
+          finalImages.push({
+            url: item.url,
+            title: item.title || '',
+            description: item.description || ''
+          });
+        } else if (item.type === 'new') {
+          const file = formData.get(item.fileKey);
+          if (file && typeof file !== 'string') {
+            let imageUrl = '';
+            if (isCloudinaryConfigured) {
+              const buffer = Buffer.from(await file.arrayBuffer());
+              const base64Image = `data:${file.type};base64,${buffer.toString('base64')}`;
+              const result = await cloudinary.uploader.upload(base64Image, {
+                folder: 'designer-portfolio/projects',
+                transformation: [{ width: 1200, crop: 'limit', quality: 85 }]
+              });
+              imageUrl = result.secure_url;
+            } else {
+              const localUploadsDir = path.join(process.cwd(), 'public/uploads');
+              if (!fs.existsSync(localUploadsDir)) {
+                fs.mkdirSync(localUploadsDir, { recursive: true });
+              }
+              const buffer = Buffer.from(await file.arrayBuffer());
+              const filename = `images-${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.name || '.jpg')}`;
+              const filepath = path.join(localUploadsDir, filename);
+              await fs.promises.writeFile(filepath, buffer);
+              imageUrl = `/uploads/${filename}`;
+            }
+            finalImages.push({
+              url: imageUrl,
+              title: item.title || '',
+              description: item.description || ''
+            });
+          }
+        }
+      }
+    } else {
+      // Fallback if no imagesMetadata is sent (old client behavior)
+      const existingImagesStr = formData.get('existingImages');
+      let keptImages = [];
+      if (existingImagesStr) {
+        try {
+          keptImages = JSON.parse(existingImagesStr);
+        } catch (e) {
+          keptImages = [existingImagesStr];
+        }
+      }
+
+      // Convert keptImages string URLs back to objects or keep them as is
+      const originalUrls = project.images.map(img => typeof img === 'string' ? img : img.url);
+      const imagesToDelete = originalUrls.filter(img => !keptImages.includes(img));
+      for (const img of imagesToDelete) {
+        await deleteImageFromStorage(img);
+      }
+
+      // Upload new files
+      const files = formData.getAll('images');
+      let newImages = [];
+      for (const file of files) {
+        if (!file || typeof file === 'string') continue;
+        let imageUrl = '';
+        if (isCloudinaryConfigured) {
+          const buffer = Buffer.from(await file.arrayBuffer());
+          const base64Image = `data:${file.type};base64,${buffer.toString('base64')}`;
+          const result = await cloudinary.uploader.upload(base64Image, {
+            folder: 'designer-portfolio/projects',
+            transformation: [{ width: 1200, crop: 'limit', quality: 85 }]
+          });
+          imageUrl = result.secure_url;
+        } else {
+          const localUploadsDir = path.join(process.cwd(), 'public/uploads');
+          if (!fs.existsSync(localUploadsDir)) {
+            fs.mkdirSync(localUploadsDir, { recursive: true });
+          }
+          const buffer = Buffer.from(await file.arrayBuffer());
+          const filename = `images-${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.name || '.jpg')}`;
+          const filepath = path.join(localUploadsDir, filename);
+          await fs.promises.writeFile(filepath, buffer);
+          imageUrl = `/uploads/${filename}`;
+        }
+        newImages.push({
+          url: imageUrl,
+          title: '',
+          description: ''
+        });
+      }
+
+      // Map kept images back to objects
+      const mappedKeptImages = keptImages.map(url => {
+        const matchingOriginal = project.images.find(img => (typeof img === 'string' ? img : img.url) === url);
+        return {
+          url: url,
+          title: matchingOriginal && typeof matchingOriginal !== 'string' ? (matchingOriginal.title || '') : '',
+          description: matchingOriginal && typeof matchingOriginal !== 'string' ? (matchingOriginal.description || '') : ''
+        };
+      });
+
+      finalImages = [...mappedKeptImages, ...newImages];
+    }
 
     // Parse tools
     let parsedTools = project.tools;
@@ -250,7 +362,7 @@ export async function DELETE(req, { params }) {
 
     // Delete all images associated with this project
     for (const img of project.images) {
-      await deleteImageFromStorage(img);
+      await deleteImageFromStorage(typeof img === 'string' ? img : img.url);
     }
 
     await Project.deleteOne({ _id: idOrSlug });

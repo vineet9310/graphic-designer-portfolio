@@ -62,33 +62,36 @@ const Portfolio = () => {
     <div className="portfolio-page">
       <div className="container">
         
-        {/* Header */}
-        <div className="portfolio-header">
-          <p className="portfolio-subtitle">
-            Portfolio
-          </p>
-          <h1 className="portfolio-title">
-            Explore My Work
-          </h1>
-          <p className="portfolio-description">
-            A curated showcase of branding campaigns, digital layouts, custom illustrations, and creative visual designs.
-          </p>
-        </div>
+        {/* Portfolio Top Bar (Header Left, Filters Right) */}
+        <div className="portfolio-top-bar">
+          {/* Header */}
+          <div className="portfolio-header">
+            <p className="portfolio-subtitle">
+              Portfolio
+            </p>
+            <h1 className="portfolio-title">
+              Explore My Work
+            </h1>
+            <p className="portfolio-description">
+              A curated showcase of branding campaigns, digital layouts, custom illustrations, and creative visual designs.
+            </p>
+          </div>
 
-        {/* Filter Pills */}
-        <div className="filter-container">
-          {categories.map((cat) => {
-            const isActive = selectedFilter === cat;
-            return (
-              <button
-                key={cat}
-                onClick={() => setSelectedFilter(cat)}
-                className={`filter-btn ${isActive ? 'active' : ''}`}
-              >
-                {cat}
-              </button>
-            );
-          })}
+          {/* Filter Pills */}
+          <div className="filter-container">
+            {categories.map((cat) => {
+              const isActive = selectedFilter === cat;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedFilter(cat)}
+                  className={`filter-btn ${isActive ? 'active' : ''}`}
+                >
+                  {cat}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Projects Grid */}

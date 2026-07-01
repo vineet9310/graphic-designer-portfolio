@@ -81,42 +81,114 @@ export async function POST(req) {
       }
     }
 
-    // Process image uploads
-    const files = formData.getAll('images');
-    let images = [];
-
-    for (const file of files) {
-      if (!file || typeof file === 'string') continue;
-      
+    // Process hero image upload
+    let coverImage = '';
+    const heroFile = formData.get('heroImage');
+    if (heroFile && typeof heroFile !== 'string') {
       if (isCloudinaryConfigured) {
-        // Upload to Cloudinary
-        const buffer = Buffer.from(await file.arrayBuffer());
-        const base64Image = `data:${file.type};base64,${buffer.toString('base64')}`;
-        
-        console.log(`Uploading ${file.name} to Cloudinary...`);
+        const buffer = Buffer.from(await heroFile.arrayBuffer());
+        const base64Image = `data:${heroFile.type};base64,${buffer.toString('base64')}`;
         const result = await cloudinary.uploader.upload(base64Image, {
           folder: 'designer-portfolio/projects',
           transformation: [{ width: 1200, crop: 'limit', quality: 85 }]
         });
-        images.push(result.secure_url);
+        coverImage = result.secure_url;
       } else {
-        // Local upload fallback
         const localUploadsDir = path.join(process.cwd(), 'public/uploads');
         if (!fs.existsSync(localUploadsDir)) {
           fs.mkdirSync(localUploadsDir, { recursive: true });
         }
-
-        const buffer = Buffer.from(await file.arrayBuffer());
-        const filename = `images-${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.name || '.jpg')}`;
+        const buffer = Buffer.from(await heroFile.arrayBuffer());
+        const filename = `hero-${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(heroFile.name || '.jpg')}`;
         const filepath = path.join(localUploadsDir, filename);
-        
-        console.log(`Saving ${file.name} locally to public/uploads...`);
         await fs.promises.writeFile(filepath, buffer);
-        images.push(`/uploads/${filename}`);
+        coverImage = `/uploads/${filename}`;
       }
     }
 
-    const coverImage = images.length > 0 ? images[0] : '';
+    // Process image uploads
+    const metadataStr = formData.get('imagesMetadata');
+    let images = [];
+
+    if (metadataStr) {
+      let metadata = [];
+      try {
+        metadata = JSON.parse(metadataStr);
+      } catch (e) {
+        console.error('Error parsing imagesMetadata:', e);
+      }
+
+      for (const item of metadata) {
+        if (item.type === 'existing') {
+          images.push({
+            url: item.url,
+            title: item.title || '',
+            description: item.description || ''
+          });
+        } else if (item.type === 'new') {
+          const file = formData.get(item.fileKey);
+          if (file && typeof file !== 'string') {
+            let imageUrl = '';
+            if (isCloudinaryConfigured) {
+              const buffer = Buffer.from(await file.arrayBuffer());
+              const base64Image = `data:${file.type};base64,${buffer.toString('base64')}`;
+              const result = await cloudinary.uploader.upload(base64Image, {
+                folder: 'designer-portfolio/projects',
+                transformation: [{ width: 1200, crop: 'limit', quality: 85 }]
+              });
+              imageUrl = result.secure_url;
+            } else {
+              const localUploadsDir = path.join(process.cwd(), 'public/uploads');
+              if (!fs.existsSync(localUploadsDir)) {
+                fs.mkdirSync(localUploadsDir, { recursive: true });
+              }
+              const buffer = Buffer.from(await file.arrayBuffer());
+              const filename = `images-${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.name || '.jpg')}`;
+              const filepath = path.join(localUploadsDir, filename);
+              await fs.promises.writeFile(filepath, buffer);
+              imageUrl = `/uploads/${filename}`;
+            }
+            images.push({
+              url: imageUrl,
+              title: item.title || '',
+              description: item.description || ''
+            });
+          }
+        }
+      }
+    } else {
+      // Fallback if no metadata is sent
+      const files = formData.getAll('images');
+      for (const file of files) {
+        if (!file || typeof file === 'string') continue;
+        
+        let imageUrl = '';
+        if (isCloudinaryConfigured) {
+          const buffer = Buffer.from(await file.arrayBuffer());
+          const base64Image = `data:${file.type};base64,${buffer.toString('base64')}`;
+          const result = await cloudinary.uploader.upload(base64Image, {
+            folder: 'designer-portfolio/projects',
+            transformation: [{ width: 1200, crop: 'limit', quality: 85 }]
+          });
+          imageUrl = result.secure_url;
+        } else {
+          const localUploadsDir = path.join(process.cwd(), 'public/uploads');
+          if (!fs.existsSync(localUploadsDir)) {
+            fs.mkdirSync(localUploadsDir, { recursive: true });
+          }
+          const buffer = Buffer.from(await file.arrayBuffer());
+          const filename = `images-${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.name || '.jpg')}`;
+          const filepath = path.join(localUploadsDir, filename);
+          await fs.promises.writeFile(filepath, buffer);
+          imageUrl = `/uploads/${filename}`;
+        }
+        images.push({
+          url: imageUrl,
+          title: '',
+          description: ''
+        });
+      }
+    }
     
     // Create Project
     const project = await Project.create({

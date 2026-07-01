@@ -23,10 +23,13 @@ const AdminProjects = () => {
   const [featured, setFeatured] = useState(false);
   const [order, setOrder] = useState(0);
 
-  // Upload/Image State
-  const [newImages, setNewImages] = useState([]); // Files to upload
-  const [newImagePreviews, setNewImagePreviews] = useState([]); // Preview URLs for new files
-  const [existingImages, setExistingImages] = useState([]); // URLs loaded during editing
+  // Unified Project Images State (holds array of { id, file, preview, description, isExisting, url })
+  const [projectImages, setProjectImages] = useState([
+    { id: `new-0-${Date.now()}`, file: null, preview: '', description: '', isExisting: false, url: '' }
+  ]);
+
+  // Hero Image State (holds { file, preview, isExisting, url })
+  const [heroImage, setHeroImage] = useState({ file: null, preview: '', isExisting: false, url: '' });
 
   const [dynamicCategories, setDynamicCategories] = useState(['Logo Design', 'Branding', 'UI/UX', 'Print', 'Social Media', 'Illustration']);
 
@@ -65,9 +68,19 @@ const AdminProjects = () => {
     setTools([]);
     setFeatured(false);
     setOrder(0);
-    setNewImages([]);
-    setNewImagePreviews([]);
-    setExistingImages([]);
+    // Revoke any created object URLs to prevent leaks
+    projectImages.forEach(img => {
+      if (img.preview && !img.isExisting) {
+        URL.revokeObjectURL(img.preview);
+      }
+    });
+    if (heroImage.preview && !heroImage.isExisting) {
+      URL.revokeObjectURL(heroImage.preview);
+    }
+    setProjectImages([
+      { id: `new-0-${Date.now()}`, file: null, preview: '', title: '', description: '', isExisting: false, url: '' }
+    ]);
+    setHeroImage({ file: null, preview: '', isExisting: false, url: '' });
     setEditMode(false);
     setCurrentProjectId(null);
   };
@@ -98,32 +111,71 @@ const AdminProjects = () => {
     setTools(tools.filter((_, idx) => idx !== indexToRemove));
   };
 
-  // Image Selection Handlers
-  const handleImageChange = (e) => {
-    const files = Array.from(e.target.files);
-    const totalCurrentCount = existingImages.length + newImages.length + files.length;
-    
-    if (totalCurrentCount > 10) {
-      toast.error('Maximum 10 images are allowed per project.');
+  // Image Slot Management Handlers
+  const addImageSlot = () => {
+    if (projectImages.length >= 15) {
+      toast.error('You can add up to 15 images per project.');
       return;
     }
-
-    setNewImages([...newImages, ...files]);
-    
-    const previewUrls = files.map(file => URL.createObjectURL(file));
-    setNewImagePreviews([...newImagePreviews, ...previewUrls]);
+    setProjectImages([
+      ...projectImages,
+      { id: `new-${Date.now()}-${Math.random()}`, file: null, preview: '', title: '', description: '', isExisting: false, url: '' }
+    ]);
   };
 
-  const removeNewImagePreview = (idxToRemove) => {
-    setNewImages(newImages.filter((_, idx) => idx !== idxToRemove));
-    
-    // Revoke object URL to free memory
-    URL.revokeObjectURL(newImagePreviews[idxToRemove]);
-    setNewImagePreviews(newImagePreviews.filter((_, idx) => idx !== idxToRemove));
+  const removeImageSlot = (idToRemove) => {
+    if (projectImages.length === 1) {
+      toast.error('At least one image is required.');
+      return;
+    }
+    const target = projectImages.find(img => img.id === idToRemove);
+    if (target && target.preview && !target.isExisting) {
+      URL.revokeObjectURL(target.preview);
+    }
+    setProjectImages(projectImages.filter(img => img.id !== idToRemove));
   };
 
-  const removeExistingImage = (imgUrl) => {
-    setExistingImages(existingImages.filter(img => img !== imgUrl));
+  const handleSlotImageChange = (id, file) => {
+    if (!file) return;
+    
+    setProjectImages(prev => prev.map(img => {
+      if (img.id === id) {
+        if (img.preview && !img.isExisting) {
+          URL.revokeObjectURL(img.preview);
+        }
+        return {
+          ...img,
+          file: file,
+          preview: URL.createObjectURL(file),
+          isExisting: false
+        };
+      }
+      return img;
+    }));
+  };
+
+  const handleSlotDescriptionChange = (id, text) => {
+    setProjectImages(prev => prev.map(img => {
+      if (img.id === id) {
+        return {
+          ...img,
+          description: text
+        };
+      }
+      return img;
+    }));
+  };
+
+  const handleSlotTitleChange = (id, text) => {
+    setProjectImages(prev => prev.map(img => {
+      if (img.id === id) {
+        return {
+          ...img,
+          title: text
+        };
+      }
+      return img;
+    }));
   };
 
   // Featured Toggle directly from table
@@ -165,7 +217,36 @@ const AdminProjects = () => {
     setTools(project.tools || []);
     setFeatured(project.featured);
     setOrder(project.order || 0);
-    setExistingImages(project.images || []);
+    
+    // Parse project images (which can be strings or objects)
+    const loadedImages = (project.images || []).map((img, idx) => {
+      const url = typeof img === 'string' ? img : img.url;
+      const title = typeof img === 'string' ? '' : (img.title || '');
+      const description = typeof img === 'string' ? '' : (img.description || '');
+      return {
+        id: `existing-${idx}-${Date.now()}`,
+        file: null,
+        preview: url,
+        title: title,
+        description: description,
+        isExisting: true,
+        url: url
+      };
+    });
+    setProjectImages(loadedImages.length > 0 ? loadedImages : [{ id: `new-0-${Date.now()}`, file: null, preview: '', title: '', description: '', isExisting: false, url: '' }]);
+    
+    // Set hero image
+    if (project.coverImage) {
+      setHeroImage({
+        file: null,
+        preview: project.coverImage,
+        isExisting: true,
+        url: project.coverImage
+      });
+    } else {
+      setHeroImage({ file: null, preview: '', isExisting: false, url: '' });
+    }
+
     setEditMode(true);
     setIsFormOpen(true);
   };
@@ -199,8 +280,16 @@ const AdminProjects = () => {
       return;
     }
 
-    if (existingImages.length === 0 && newImages.length === 0) {
-      toast.error('Please upload at least one cover image.');
+    // Validation: make sure Hero Image is present
+    if (!heroImage.isExisting && !heroImage.file) {
+      toast.error('Please upload a Hero Image (Cover Image).');
+      return;
+    }
+
+    // Validation: make sure all gallery slots have images
+    const hasEmptyImageSlot = projectImages.some(img => !img.isExisting && !img.file);
+    if (hasEmptyImageSlot) {
+      toast.error('Please choose an image file for all gallery slots or remove empty slots.');
       return;
     }
 
@@ -215,14 +304,37 @@ const AdminProjects = () => {
     formData.append('featured', featured);
     formData.append('order', order);
 
-    if (editMode) {
-      formData.append('existingImages', JSON.stringify(existingImages));
+    // Append Hero Image
+    if (heroImage.file) {
+      formData.append('heroImage', heroImage.file);
+    } else if (heroImage.isExisting) {
+      formData.append('existingHeroImage', heroImage.url);
     }
 
-    // Append new files
-    newImages.forEach(file => {
-      formData.append('images', file);
+    // Build the images metadata and append files
+    const metadata = [];
+    let fileCount = 0;
+    projectImages.forEach((img) => {
+      if (img.isExisting) {
+        metadata.push({
+          type: 'existing',
+          url: img.url,
+          title: img.title || '',
+          description: img.description
+        });
+      } else if (img.file) {
+        const fileKey = `new_image_${fileCount}`;
+        metadata.push({
+          type: 'new',
+          fileKey: fileKey,
+          title: img.title || '',
+          description: img.description
+        });
+        formData.append(fileKey, img.file);
+        fileCount++;
+      }
     });
+    formData.append('imagesMetadata', JSON.stringify(metadata));
 
     try {
       let response;
@@ -370,96 +482,23 @@ const AdminProjects = () => {
             {/* Form fields */}
             <form onSubmit={handleSubmit} className="admin-form">
               
-              {/* Title & Category Row */}
-              <div className="admin-form-row" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                <div className="form-group">
-                  <label htmlFor="title" className="form-label">Project Title</label>
-                  <input
-                    type="text"
-                    id="title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    required
-                    className="form-input"
-                    placeholder="Aether Identity Pack"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label" style={{ marginBottom: '0.75rem' }}>Project Category</label>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                    {dynamicCategories.map((cat) => {
-                      const isActive = category === cat && !showCustomCategory;
-                      return (
-                        <button
-                          type="button"
-                          key={cat}
-                          onClick={() => {
-                            setCategory(cat);
-                            setShowCustomCategory(false);
-                          }}
-                          style={{
-                            border: 'none',
-                            outline: 'none',
-                            cursor: 'pointer',
-                            padding: '0.5rem 1rem',
-                            borderRadius: '20px',
-                            fontSize: '0.8rem',
-                            fontWeight: '600',
-                            backgroundColor: isActive ? 'var(--accent)' : 'rgba(255,255,255,0.04)',
-                            color: isActive ? '#fff' : 'var(--text-secondary)',
-                            border: isActive ? '1px solid var(--accent)' : '1px solid var(--border)',
-                            transition: 'all 0.2s',
-                          }}
-                        >
-                          {cat}
-                        </button>
-                      );
-                    })}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setCategory('Other');
-                        setShowCustomCategory(true);
-                      }}
-                      style={{
-                        border: 'none',
-                        outline: 'none',
-                        cursor: 'pointer',
-                        padding: '0.5rem 1rem',
-                        borderRadius: '20px',
-                        fontSize: '0.8rem',
-                        fontWeight: '600',
-                        backgroundColor: showCustomCategory ? 'var(--accent)' : 'rgba(255,255,255,0.04)',
-                        color: showCustomCategory ? '#fff' : 'var(--accent)',
-                        border: showCustomCategory ? '1px solid var(--accent)' : '1px dashed var(--accent)',
-                        transition: 'all 0.2s',
-                      }}
-                    >
-                      + Other Category
-                    </button>
-                  </div>
-
-                  {showCustomCategory && (
-                    <div style={{ animation: 'fadeIn 0.2s ease-in-out', marginTop: '0.75rem' }}>
-                      <label className="form-label" style={{ fontSize: '0.75rem', color: 'var(--accent)' }}>Specify Custom Category Name</label>
-                      <input
-                        type="text"
-                        value={customCategory}
-                        onChange={(e) => setCustomCategory(e.target.value)}
-                        className="form-input"
-                        placeholder="e.g. 3D Design, Editorial, Packaging..."
-                        required={showCustomCategory}
-                        style={{ marginTop: '0.25rem', width: '100%' }}
-                      />
-                    </div>
-                  )}
-                </div>
+              {/* Title Input */}
+              <div className="form-group">
+                <label htmlFor="title" className="form-label">Project Title</label>
+                <input
+                  type="text"
+                  id="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  required
+                  className="form-input"
+                  placeholder="Aether Identity Pack"
+                />
               </div>
 
-              {/* Description */}
+              {/* Description Input */}
               <div className="form-group">
-                <label htmlFor="description" className="form-label">Description</label>
+                <label htmlFor="description" className="form-label">Project Description</label>
                 <textarea
                   id="description"
                   value={description}
@@ -468,6 +507,136 @@ const AdminProjects = () => {
                   className="form-textarea"
                   placeholder="Enter detailed description of what this project accomplished..."
                 />
+              </div>
+
+              {/* Hero Image */}
+              <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label className="form-label" style={{ margin: 0, fontWeight: 'bold' }}>
+                  Project Hero Image (Main Cover Image)
+                </label>
+                <div style={{ position: 'relative', width: '100%', height: '220px', borderRadius: '8px', overflow: 'hidden', border: '2px dashed var(--accent)', backgroundColor: 'rgba(0,0,0,0.2)' }}>
+                  {heroImage.preview ? (
+                    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+                      <img src={heroImage.preview} alt="Hero Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <label style={{ position: 'absolute', bottom: '10px', right: '10px', background: 'rgba(0,0,0,0.75)', color: '#fff', fontSize: '0.8rem', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer', border: '1px solid rgba(255,255,255,0.2)' }}>
+                        Change Hero Image
+                        <input
+                          type="file"
+                          accept="image/*"
+                          style={{ display: 'none' }}
+                          onChange={(e) => {
+                            const file = e.target.files[0];
+                            if (file) {
+                              if (heroImage.preview && !heroImage.isExisting) {
+                                URL.revokeObjectURL(heroImage.preview);
+                              }
+                              setHeroImage({
+                                file,
+                                preview: URL.createObjectURL(file),
+                                isExisting: false,
+                                url: ''
+                              });
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
+                  ) : (
+                    <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', cursor: 'pointer', gap: '0.5rem' }}>
+                      <FaUpload style={{ color: 'var(--accent)', fontSize: '2rem' }} />
+                      <span style={{ fontSize: '0.9rem', color: 'var(--text-primary)', fontWeight: '600' }}>Upload Hero Image</span>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Supports JPEG, JPG, PNG, WEBP (Max 10MB)</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (file) {
+                            setHeroImage({
+                              file,
+                              preview: URL.createObjectURL(file),
+                              isExisting: false,
+                              url: ''
+                            });
+                          }
+                        }}
+                      />
+                    </label>
+                  )}
+                </div>
+              </div>
+
+              {/* Category selector */}
+              <div className="form-group">
+                <label className="form-label" style={{ marginBottom: '0.75rem' }}>Project Category</label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                  {dynamicCategories.map((cat) => {
+                    const isActive = category === cat && !showCustomCategory;
+                    return (
+                      <button
+                        type="button"
+                        key={cat}
+                        onClick={() => {
+                          setCategory(cat);
+                          setShowCustomCategory(false);
+                        }}
+                        style={{
+                          border: 'none',
+                          outline: 'none',
+                          cursor: 'pointer',
+                          padding: '0.5rem 1rem',
+                          borderRadius: '20px',
+                          fontSize: '0.8rem',
+                          fontWeight: '600',
+                          backgroundColor: isActive ? 'var(--accent)' : 'rgba(255,255,255,0.04)',
+                          color: isActive ? '#fff' : 'var(--text-secondary)',
+                          border: isActive ? '1px solid var(--accent)' : '1px solid var(--border)',
+                          transition: 'all 0.2s',
+                        }}
+                      >
+                        {cat}
+                      </button>
+                    );
+                  })}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCategory('Other');
+                      setShowCustomCategory(true);
+                    }}
+                    style={{
+                      border: 'none',
+                      outline: 'none',
+                      cursor: 'pointer',
+                      padding: '0.5rem 1rem',
+                      borderRadius: '20px',
+                      fontSize: '0.8rem',
+                      fontWeight: '600',
+                      backgroundColor: showCustomCategory ? 'var(--accent)' : 'rgba(255,255,255,0.04)',
+                      color: showCustomCategory ? '#fff' : 'var(--accent)',
+                      border: showCustomCategory ? '1px solid var(--accent)' : '1px dashed var(--accent)',
+                      transition: 'all 0.2s',
+                    }}
+                  >
+                    + Other Category
+                  </button>
+                </div>
+
+                {showCustomCategory && (
+                  <div style={{ animation: 'fadeIn 0.2s ease-in-out', marginTop: '0.75rem' }}>
+                    <label className="form-label" style={{ fontSize: '0.75rem', color: 'var(--accent)' }}>Specify Custom Category Name</label>
+                    <input
+                      type="text"
+                      value={customCategory}
+                      onChange={(e) => setCustomCategory(e.target.value)}
+                      className="form-input"
+                      placeholder="e.g. 3D Design, Editorial, Packaging..."
+                      required={showCustomCategory}
+                      style={{ marginTop: '0.25rem', width: '100%' }}
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Tools Used (Tag Input) */}
@@ -499,79 +668,177 @@ const AdminProjects = () => {
                 </div>
               </div>
 
-              {/* Image Upload Gallery */}
-              <div className="form-group">
-                <label className="form-label">Project Images (Up to 10 files. First will be cover)</label>
-                
-                {/* Drag/Drop Box */}
-                <label className="admin-project-upload-box" style={{ border: '2px dashed var(--accent)', transition: 'all 0.2s', cursor: 'pointer' }}>
-                  <FaUpload className="admin-project-upload-icon" />
-                  <span className="admin-project-upload-text">
-                    Click to choose or drag images here
-                  </span>
-                  <span className="admin-project-upload-subtext">
-                    Supports JPEG, JPG, PNG, WEBP (Max 10MB)
-                  </span>
-                  <span className="admin-project-upload-subtext" style={{ fontSize: '0.75rem', color: 'var(--accent)', marginTop: '0.2rem' }}>
-                    Recommended size: 7:5 landscape aspect ratio (e.g. 800 x 560 px)
-                  </span>
-                  <input
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="admin-project-upload-input"
-                  />
-                </label>
-
-                {/* Previews Collection */}
-                <div className="admin-project-previews-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
-                  {/* Existing Images (loaded during Edit) */}
-                  {existingImages.map((imgUrl, idx) => {
-                    const isCover = idx === 0;
-                    return (
-                      <div key={`exist-${idx}`} className="admin-project-preview-item" style={{ position: 'relative', borderRadius: '8px', overflow: 'hidden', border: isCover ? '2px solid var(--accent)' : '1px solid var(--border)', aspectRatio: '7/5' }}>
-                        <img src={imgUrl} alt="Existing Preview" className="admin-project-preview-img" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        {isCover && (
-                          <span style={{ position: 'absolute', top: '5px', left: '5px', backgroundColor: 'var(--accent)', color: '#fff', fontSize: '0.65rem', fontWeight: 'bold', padding: '2px 6px', borderRadius: '4px' }}>
-                            Cover
-                          </span>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => removeExistingImage(imgUrl)}
-                          className="admin-project-preview-remove-btn"
-                          style={{ position: 'absolute', top: '5px', right: '5px', border: 'none', background: 'rgba(0,0,0,0.6)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '20px', height: '20px', borderRadius: '50%', color: '#fff' }}
-                        >
-                          <FaTimes style={{ fontSize: '0.7rem' }} />
-                        </button>
-                      </div>
-                    );
-                  })}
-
-                  {/* New Upload Previews */}
-                  {newImagePreviews.map((previewUrl, idx) => {
-                    const isCover = existingImages.length === 0 && idx === 0;
-                    return (
-                      <div key={`new-${idx}`} className="admin-project-preview-item new-upload" style={{ position: 'relative', borderRadius: '8px', overflow: 'hidden', border: isCover ? '2px solid var(--accent)' : '1px solid var(--border)', aspectRatio: '7/5' }}>
-                        <img src={previewUrl} alt="New Preview" className="admin-project-preview-img" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        {isCover && (
-                          <span style={{ position: 'absolute', top: '5px', left: '5px', backgroundColor: 'var(--accent)', color: '#fff', fontSize: '0.65rem', fontWeight: 'bold', padding: '2px 6px', borderRadius: '4px' }}>
-                            Cover
-                          </span>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => removeNewImagePreview(idx)}
-                          className="admin-project-preview-remove-btn"
-                          style={{ position: 'absolute', top: '5px', right: '5px', border: 'none', background: 'rgba(0,0,0,0.6)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '20px', height: '20px', borderRadius: '50%', color: '#fff' }}
-                        >
-                          <FaTimes style={{ fontSize: '0.7rem' }} />
-                        </button>
-                      </div>
-                    );
-                  })}
+              {/* Project Images & Descriptions Section */}
+              <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', border: '1px solid rgba(255,255,255,0.06)', padding: '1.25rem', borderRadius: '10px', backgroundColor: 'rgba(255,255,255,0.01)', marginTop: '0.5rem', marginBottom: '0.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <label className="form-label" style={{ margin: 0, fontSize: '0.95rem', fontWeight: 'bold' }}>
+                    Project Gallery Images ({projectImages.length} / 15)
+                  </label>
                 </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginTop: '0.5rem' }}>
+                  {projectImages.map((img, idx) => (
+                    <div
+                      key={img.id}
+                      style={{
+                        padding: '1rem',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        backgroundColor: 'rgba(0,0,0,0.15)',
+                        position: 'relative'
+                      }}
+                    >
+                      {/* Slot Header / Delete */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                        <span style={{ fontSize: '0.85rem', fontWeight: 'bold', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                          Image #{idx + 1}
+                        </span>
+                        {projectImages.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeImageSlot(img.id)}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              color: '#ff4d4d',
+                              cursor: 'pointer',
+                              fontSize: '0.8rem',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.25rem',
+                              padding: '2px 6px',
+                              borderRadius: '4px',
+                              transition: 'background 0.2s',
+                            }}
+                          >
+                            <FaTrashAlt /> Remove
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Content Row */}
+                      <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                        {/* Selector/Preview Box */}
+                        <div style={{ position: 'relative', width: '150px', height: '145px', borderRadius: '6px', overflow: 'hidden', border: '1px dashed var(--border)', flexShrink: 0, backgroundColor: '#000' }}>
+                          {img.preview ? (
+                            <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+                              <img src={img.preview} alt={`Preview ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                              <label style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.7)', color: '#fff', fontSize: '0.65rem', padding: '0.25rem', textAlign: 'center', cursor: 'pointer' }}>
+                                Change Image
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  style={{ display: 'none' }}
+                                  onChange={(e) => handleSlotImageChange(img.id, e.target.files[0])}
+                                />
+                              </label>
+                            </div>
+                          ) : (
+                            <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', cursor: 'pointer', gap: '0.25rem' }}>
+                              <FaUpload style={{ color: 'var(--accent)', fontSize: '1.2rem' }} />
+                              <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)' }}>Upload Image</span>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                style={{ display: 'none' }}
+                                onChange={(e) => handleSlotImageChange(img.id, e.target.files[0])}
+                              />
+                            </label>
+                          )}
+                        </div>
+
+                        {/* Text Inputs Column */}
+                        <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: '0.75rem', minWidth: '220px' }}>
+                          {/* Title Input */}
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                            <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: '600' }}>
+                              Image Title
+                            </label>
+                            <input
+                              type="text"
+                              value={img.title || ''}
+                              onChange={(e) => handleSlotTitleChange(img.id, e.target.value)}
+                              placeholder="e.g. Logo Design, Typography details..."
+                              style={{
+                                width: '100%',
+                                background: 'rgba(255,255,255,0.03)',
+                                border: '1px solid var(--border)',
+                                borderRadius: '6px',
+                                padding: '0.4rem 0.6rem',
+                                color: '#fff',
+                                fontSize: '0.85rem',
+                                outline: 'none',
+                              }}
+                            />
+                          </div>
+
+                          {/* Description Textarea */}
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                            <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: '600' }}>
+                              Image Description / Caption
+                            </label>
+                            <textarea
+                              value={img.description}
+                              onChange={(e) => handleSlotDescriptionChange(img.id, e.target.value)}
+                              placeholder="Explain what this specific image shows..."
+                              style={{
+                                width: '100%',
+                                height: '65px',
+                                background: 'rgba(255,255,255,0.03)',
+                                border: '1px solid var(--border)',
+                                borderRadius: '6px',
+                                padding: '0.4rem 0.6rem',
+                                color: '#fff',
+                                fontSize: '0.85rem',
+                                resize: 'none',
+                                outline: 'none',
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {projectImages.length < 15 ? (
+                  <button
+                    type="button"
+                    onClick={addImageSlot}
+                    style={{
+                      marginTop: '0.5rem',
+                      alignSelf: 'flex-start',
+                      padding: '0.6rem 1.2rem',
+                      borderRadius: '20px',
+                      fontSize: '0.8rem',
+                      fontWeight: 'bold',
+                      backgroundColor: 'rgba(255,255,255,0.04)',
+                      color: 'var(--accent)',
+                      border: '1px dashed var(--accent)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.4rem',
+                      transition: 'all 0.2s',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = 'var(--accent)';
+                      e.target.style.color = '#fff';
+                      e.target.style.borderStyle = 'solid';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = 'rgba(255,255,255,0.04)';
+                      e.target.style.color = 'var(--accent)';
+                      e.target.style.borderStyle = 'dashed';
+                    }}
+                  >
+                    <FaPlus /> Add More Image & Description
+                  </button>
+                ) : (
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', alignSelf: 'flex-start', marginTop: '0.5rem' }}>
+                    Limit reached (15/15 images added)
+                  </span>
+                )}
               </div>
 
               {/* Featured & Order Row */}
