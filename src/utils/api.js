@@ -28,6 +28,7 @@ const api = async (endpoint, options = {}) => {
   }
 
   const fetchOptions = {
+    cache: 'no-store', // Disable Next.js data cache to prevent stale API responses
     ...options,
     headers,
   };
