@@ -5,6 +5,64 @@ import api from '@/utils/api';
 import { toast } from 'react-hot-toast';
 import { FaPlus, FaTrashAlt, FaEdit, FaStar, FaTimes, FaUpload } from 'react-icons/fa';
 
+// Client-side image compressor to prevent "Request Entity Too Large" (FUNCTION_PAYLOAD_TOO_LARGE) on serverless platforms
+const compressImage = (file, maxWidth = 1200, maxWeightBytes = 500 * 1024) => {
+  return new Promise((resolve) => {
+    if (typeof window === 'undefined' || !window.FileReader || !document.createElement('canvas').getContext) {
+      return resolve(file);
+    }
+    
+    if (!file.type.startsWith('image/')) {
+      return resolve(file);
+    }
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        let quality = 0.8;
+        const tryCompress = (q) => {
+          canvas.toBlob((blob) => {
+            if (!blob) {
+              return resolve(file);
+            }
+            if (blob.size > maxWeightBytes && q > 0.3) {
+              tryCompress(q - 0.15);
+            } else {
+              const compressedFile = new File([blob], file.name, {
+                type: 'image/jpeg',
+                lastModified: Date.now()
+              });
+              resolve(compressedFile);
+            }
+          }, 'image/jpeg', q);
+        };
+
+        tryCompress(quality);
+      };
+      img.onerror = () => resolve(file);
+    };
+    reader.onerror = () => resolve(file);
+  });
+};
+
 const AdminProjects = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -304,17 +362,18 @@ const AdminProjects = () => {
     formData.append('featured', featured);
     formData.append('order', order);
 
-    // Append Hero Image
+    // Append Hero Image (with client-side compression)
     if (heroImage.file) {
-      formData.append('heroImage', heroImage.file);
+      const compressedHero = await compressImage(heroImage.file);
+      formData.append('heroImage', compressedHero);
     } else if (heroImage.isExisting) {
       formData.append('existingHeroImage', heroImage.url);
     }
 
-    // Build the images metadata and append files
+    // Build the images metadata and append files (with client-side compression)
     const metadata = [];
     let fileCount = 0;
-    projectImages.forEach((img) => {
+    for (const img of projectImages) {
       if (img.isExisting) {
         metadata.push({
           type: 'existing',
@@ -324,16 +383,17 @@ const AdminProjects = () => {
         });
       } else if (img.file) {
         const fileKey = `new_image_${fileCount}`;
+        const compressedImgFile = await compressImage(img.file);
         metadata.push({
           type: 'new',
           fileKey: fileKey,
           title: img.title || '',
           description: img.description
         });
-        formData.append(fileKey, img.file);
+        formData.append(fileKey, compressedImgFile);
         fileCount++;
       }
-    });
+    }
     formData.append('imagesMetadata', JSON.stringify(metadata));
 
     try {
