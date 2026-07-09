@@ -29,6 +29,21 @@ const AdminBlogs = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
+
+  const totalPages = Math.ceil(blogs.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedBlogs = blogs.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  // Adjust currentPage if it exceeds totalPages (e.g. after deletion)
+  useEffect(() => {
+    if (currentPage > 1 && currentPage > totalPages) {
+      setCurrentPage(totalPages || 1);
+    }
+  }, [blogs.length, totalPages, currentPage]);
+
   const categories = [
     'Design Theory',
     'Case Study',
@@ -312,7 +327,7 @@ const AdminBlogs = () => {
                 </tr>
               </thead>
               <tbody>
-                {blogs.map((blog) => (
+                {paginatedBlogs.map((blog) => (
                   <tr key={blog._id}>
                     {/* Thumbnail */}
                     <td className="admin-table-w-80">
@@ -375,6 +390,46 @@ const AdminBlogs = () => {
                 ))}
               </tbody>
             </table>
+          )}
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="admin-pagination-container">
+              <span className="admin-pagination-info">
+                Showing {startIndex + 1}–{Math.min(startIndex + ITEMS_PER_PAGE, blogs.length)} of {blogs.length} posts
+              </span>
+              <div className="admin-pagination-buttons">
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="admin-pagination-btn"
+                >
+                  Previous
+                </button>
+                {[...Array(totalPages)].map((_, idx) => {
+                  const pageNum = idx + 1;
+                  return (
+                    <button
+                      type="button"
+                      key={pageNum}
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={`admin-pagination-page-btn ${currentPage === pageNum ? 'active' : ''}`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="admin-pagination-btn"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
           )}
         </div>
       )}

@@ -1,37 +1,7 @@
 import { verifyAdmin } from '@/lib/auth';
 import { NextResponse } from 'next/server';
-import { v2 as cloudinary } from 'cloudinary';
-import fs from 'fs';
+import { cloudinary, isCloudinaryConfigured, uploadToLocal } from '@/lib/cloudinary';
 import path from 'path';
-
-const isCloudinaryConfigured =
-  process.env.CLOUDINARY_CLOUD_NAME &&
-  process.env.CLOUDINARY_CLOUD_NAME !== 'your_cloud_name' &&
-  process.env.CLOUDINARY_API_KEY &&
-  process.env.CLOUDINARY_API_KEY !== 'your_api_key' &&
-  process.env.CLOUDINARY_API_SECRET &&
-  process.env.CLOUDINARY_API_SECRET !== 'your_api_secret';
-
-if (isCloudinaryConfigured) {
-  cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
-  });
-}
-
-const uploadToLocal = async (file) => {
-  const localUploadsDir = path.join(process.cwd(), 'public/uploads');
-  if (!fs.existsSync(localUploadsDir)) {
-    fs.mkdirSync(localUploadsDir, { recursive: true });
-  }
-  const buffer = Buffer.from(await file.arrayBuffer());
-  const prefix = file.type === 'application/pdf' ? 'document' : 'portrait';
-  const filename = `${prefix}-${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.name || '.jpg')}`;
-  const filepath = path.join(localUploadsDir, filename);
-  await fs.promises.writeFile(filepath, buffer);
-  return `/uploads/${filename}`;
-};
 
 const uploadToCloudinary = async (file) => {
   const buffer = Buffer.from(await file.arrayBuffer());
@@ -85,14 +55,10 @@ export async function POST(req) {
     let url;
 
     if (isCloudinaryConfigured) {
-      try {
-        url = await uploadToCloudinary(file);
-      } catch (cloudinaryError) {
-        console.warn('Cloudinary upload failed, falling back to local storage:', cloudinaryError.message);
-        url = await uploadToLocal(file);
-      }
+      url = await uploadToCloudinary(file);
     } else {
-      url = await uploadToLocal(file);
+      const prefix = file.type === 'application/pdf' ? 'document' : 'portrait';
+      url = await uploadToLocal(file, prefix);
     }
 
     return NextResponse.json({ success: true, url });

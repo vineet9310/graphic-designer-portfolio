@@ -2,26 +2,7 @@ import connectDB from '@/lib/db';
 import Project from '@/models/Project';
 import { verifyAdmin } from '@/lib/auth';
 import { NextResponse } from 'next/server';
-import { v2 as cloudinary } from 'cloudinary';
-import fs from 'fs';
-import path from 'path';
-
-// Configure Cloudinary if credentials are set
-const isCloudinaryConfigured = 
-  process.env.CLOUDINARY_CLOUD_NAME && 
-  process.env.CLOUDINARY_CLOUD_NAME !== 'your_cloud_name' &&
-  process.env.CLOUDINARY_API_KEY && 
-  process.env.CLOUDINARY_API_KEY !== 'your_api_key' &&
-  process.env.CLOUDINARY_API_SECRET && 
-  process.env.CLOUDINARY_API_SECRET !== 'your_api_secret';
-
-if (isCloudinaryConfigured) {
-  cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
-  });
-}
+import { cloudinary, isCloudinaryConfigured, uploadToLocal } from '@/lib/cloudinary';
 
 // GET all projects
 export async function GET() {
@@ -94,15 +75,7 @@ export async function POST(req) {
         });
         coverImage = result.secure_url;
       } else {
-        const localUploadsDir = path.join(process.cwd(), 'public/uploads');
-        if (!fs.existsSync(localUploadsDir)) {
-          fs.mkdirSync(localUploadsDir, { recursive: true });
-        }
-        const buffer = Buffer.from(await heroFile.arrayBuffer());
-        const filename = `hero-${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(heroFile.name || '.jpg')}`;
-        const filepath = path.join(localUploadsDir, filename);
-        await fs.promises.writeFile(filepath, buffer);
-        coverImage = `/uploads/${filename}`;
+        coverImage = await uploadToLocal(heroFile, 'hero');
       }
     }
 
@@ -138,15 +111,7 @@ export async function POST(req) {
               });
               imageUrl = result.secure_url;
             } else {
-              const localUploadsDir = path.join(process.cwd(), 'public/uploads');
-              if (!fs.existsSync(localUploadsDir)) {
-                fs.mkdirSync(localUploadsDir, { recursive: true });
-              }
-              const buffer = Buffer.from(await file.arrayBuffer());
-              const filename = `images-${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.name || '.jpg')}`;
-              const filepath = path.join(localUploadsDir, filename);
-              await fs.promises.writeFile(filepath, buffer);
-              imageUrl = `/uploads/${filename}`;
+              imageUrl = await uploadToLocal(file, 'images');
             }
             images.push({
               url: imageUrl,
@@ -172,15 +137,7 @@ export async function POST(req) {
           });
           imageUrl = result.secure_url;
         } else {
-          const localUploadsDir = path.join(process.cwd(), 'public/uploads');
-          if (!fs.existsSync(localUploadsDir)) {
-            fs.mkdirSync(localUploadsDir, { recursive: true });
-          }
-          const buffer = Buffer.from(await file.arrayBuffer());
-          const filename = `images-${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.name || '.jpg')}`;
-          const filepath = path.join(localUploadsDir, filename);
-          await fs.promises.writeFile(filepath, buffer);
-          imageUrl = `/uploads/${filename}`;
+          imageUrl = await uploadToLocal(file, 'images');
         }
         images.push({
           url: imageUrl,

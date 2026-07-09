@@ -91,6 +91,21 @@ const AdminProjects = () => {
 
   const [dynamicCategories, setDynamicCategories] = useState(['Logo Design', 'Branding', 'UI/UX', 'Print', 'Social Media', 'Illustration']);
 
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
+
+  const totalPages = Math.ceil(projects.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedProjects = projects.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  // Adjust currentPage if it exceeds totalPages (e.g. after deletion)
+  useEffect(() => {
+    if (currentPage > 1 && currentPage > totalPages) {
+      setCurrentPage(totalPages || 1);
+    }
+  }, [projects.length, totalPages, currentPage]);
+
   const fetchProjects = async () => {
     try {
       setLoading(true);
@@ -461,7 +476,7 @@ const AdminProjects = () => {
                 </tr>
               </thead>
               <tbody>
-                {projects.map((project) => (
+                {paginatedProjects.map((project) => (
                   <tr key={project._id}>
                     {/* Image Thumbnail */}
                     <td className="admin-table-w-80">
@@ -518,6 +533,46 @@ const AdminProjects = () => {
                 ))}
               </tbody>
             </table>
+          )}
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="admin-pagination-container">
+              <span className="admin-pagination-info">
+                Showing {startIndex + 1}–{Math.min(startIndex + ITEMS_PER_PAGE, projects.length)} of {projects.length} projects
+              </span>
+              <div className="admin-pagination-buttons">
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="admin-pagination-btn"
+                >
+                  Previous
+                </button>
+                {[...Array(totalPages)].map((_, idx) => {
+                  const pageNum = idx + 1;
+                  return (
+                    <button
+                      type="button"
+                      key={pageNum}
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={`admin-pagination-page-btn ${currentPage === pageNum ? 'active' : ''}`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="admin-pagination-btn"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
           )}
         </div>
       )}

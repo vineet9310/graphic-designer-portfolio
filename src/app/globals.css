@@ -2462,11 +2462,15 @@ button, input, select, textarea {
 .blog-card-meta {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  justify-content: space-between;
   font-size: 0.75rem;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+.blog-card-meta .blog-card-dot {
+  display: none;
 }
 
 .blog-card-category {
@@ -3056,6 +3060,8 @@ button, input, select, textarea {
   overflow-x: auto;
   background-color: var(--bg-card);
   border: 1px solid var(--border);
+  height: auto;
+  cursor: default;
 }
 .admin-star-icon {
   stroke: currentColor;
@@ -6195,5 +6201,75 @@ nextjs-portal,
   background-color: rgba(255, 255, 255, 0.02) !important;
   box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.2);
 }
+
+/* Admin Pagination Styles */
+.admin-pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid var(--border);
+  background-color: var(--bg-card);
+}
+
+.admin-pagination-info {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.admin-pagination-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.admin-pagination-btn {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+.admin-pagination-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.admin-pagination-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.admin-pagination-page-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-pagination-page-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.admin-pagination-page-btn.active {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
 
 
